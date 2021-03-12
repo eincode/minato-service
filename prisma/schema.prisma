@@ -10,8 +10,70 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  UNSPECIFIED
+  BUYER
+  SELLER
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password       String
+  role           Role             @default(UNSPECIFIED)
+  company        Company?
+  PersonInCharge PersonInCharge?
+}
+
+model Company {
+  id             Int             @id @default(autoincrement())
+  country        String
+  name           String
+  type           String
+  address        String
+  website        String
+  email          String
+  phone          String
+  category       String
+  request        String
+  img            String?
+  user           User            @relation(fields: [userId], references: [id])
+  userId         Int
+  createdAt      DateTime        @default(now())
+  personInCharge PersonInCharge? @relation(name: "company")
+  products       Product[]
+  SavedCompany   SavedCompany[]
+}
+
+model PersonInCharge {
+  id           Int            @id @default(autoincrement())
+  name         String
+  nationality  String
+  email        String
+  phone        String
+  img          String?
+  company      Company        @relation(name: "company", fields: [companyId], references: [id])
+  companyId    Int
+  SavedCompany SavedCompany[]
+  user         User           @relation(fields: [userId], references: [id])
+  userId       Int
+}
+
+model SavedCompany {
+  id               Int            @id @default(autoincrement())
+  personInCharge   PersonInCharge @relation(fields: [personInChargeId], references: [id])
+  personInChargeId Int
+  companies        Company[]
+}
+
+model Product {
+  id                   Int     @id @default(autoincrement())
+  category             String
+  name                 String
+  description          String
+  img                  String?
+  isHalal              Boolean
+  minimumOrderQuantity String
+  company              Company @relation(fields: [companyId], references: [id])
+  companyId            Int
 }
