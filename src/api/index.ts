@@ -7,7 +7,7 @@ import User from "./routes/User";
 export default (dbClient: PrismaClient) => {
   const app = Router();
   Auth(app, dbClient);
-  User(app);
+  User(app, dbClient);
 
   return app;
 };

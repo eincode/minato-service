@@ -14,4 +14,16 @@ type User = {
   email: string;
 };
 
-export type { RegisterRequest, LoginRequest, User };
+type UserRole = "UNSPECIFIED" | "SELLER" | "BUYER";
+
+type UpdateRoleRequest = {
+  role: UserRole;
+};
+
+export type {
+  RegisterRequest,
+  LoginRequest,
+  User,
+  UserRole,
+  UpdateRoleRequest,
+};

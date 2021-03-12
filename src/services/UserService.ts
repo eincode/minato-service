@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import config from "@/config";
+import { UserRole } from "@/types/User";
 
 async function hashPassword(password: string) {
   const salt = await bcrypt.genSalt(parseInt(config.saltFactor));
@@ -81,4 +82,20 @@ async function getUserById(id: string, dbClient: PrismaClient) {
   };
 }
 
-export { signUp, login, getUserById };
+async function updateUserRole(
+  userId: string,
+  role: UserRole,
+  dbClient: PrismaClient
+) {
+  const user = await dbClient.user.update({
+    where: {
+      id: parseInt(userId),
+    },
+    data: {
+      role: role,
+    },
+  });
+  return user;
+}
+
+export { signUp, login, getUserById, updateUserRole };
