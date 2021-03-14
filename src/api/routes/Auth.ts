@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 
 import { LoginRequest, RegisterRequest } from "@/types/User";
-import { login, signUp } from "@/services/UserService";
+import { login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
 
 const route = Router();
