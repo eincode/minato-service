@@ -1,9 +1,15 @@
 import { PrismaClient } from ".prisma/client";
 import { Router } from "express";
 
-import { CreateCompanyRequest } from "@/types/Company";
+import { CreateCompanyRequest, SaveCompanyRequest } from "@/types/Company";
 import { auth } from "../middlewares/Auth";
-import { createCompany, getCompanyById } from "@/services/CompanyService";
+import {
+  createCompany,
+  getCompanyById,
+  getMyCompany,
+  getSavedCompany,
+  saveCompany,
+} from "@/services/CompanyService";
 
 const route = Router();
 
@@ -24,6 +30,38 @@ export default (app: Router, dbClient: PrismaClient) => {
     const id = req.query.id as string;
     try {
       const result = await getCompanyById(id, dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/me", auth, async (req, res, next) => {
+    try {
+      const result = await getMyCompany(req.user._id, dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/save", auth, async (req, res, next) => {
+    const request = req.body as SaveCompanyRequest;
+    try {
+      const result = await saveCompany(
+        request.companyId,
+        dbClient,
+        req.user._id
+      );
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/saved", auth, async (req, res, next) => {
+    try {
+      const result = await getSavedCompany(req.user._id, dbClient);
       return res.json(result);
     } catch (err) {
       next(err);

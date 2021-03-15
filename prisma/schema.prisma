@@ -7,7 +7,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["createMany"]
 }
 
 enum Role {
@@ -17,10 +18,10 @@ enum Role {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
+  id             Int             @id @default(autoincrement())
+  email          String          @unique
   password       String
-  role           Role             @default(UNSPECIFIED)
+  role           Role            @default(UNSPECIFIED)
   company        Company?
   PersonInCharge PersonInCharge?
 }
@@ -61,7 +62,7 @@ model PersonInCharge {
 model SavedCompany {
   id               Int            @id @default(autoincrement())
   personInCharge   PersonInCharge @relation(fields: [personInChargeId], references: [id])
-  personInChargeId Int
+  personInChargeId Int            @unique
   companies        Company[]
 }
 

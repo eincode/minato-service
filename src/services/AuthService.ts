@@ -33,14 +33,14 @@ async function signUp(user: RegisterRequest, dbClient: PrismaClient) {
 
   const hashedPassword = await hashPassword(user.password);
   console.log(hashedPassword);
-  await dbClient.user.create({
+  const createdUser = await dbClient.user.create({
     data: {
       email: user.email,
       password: hashedPassword,
     },
   });
 
-  return { email: user.email };
+  return { email: user.email, accessToken: generateToken(createdUser) };
 }
 
 async function login(req: LoginRequest, dbClient: PrismaClient) {

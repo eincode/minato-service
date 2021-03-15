@@ -40,7 +40,6 @@ async function loadExpress(app: Express, dbClient: PrismaClient) {
   app.use("/static", express.static("img"));
   app.use(config.api.prefix, routes(dbClient));
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.log(err.name);
     if (err.name === "UnauthorizedError") {
       return res.status(401).json({ message: err.message });
     }

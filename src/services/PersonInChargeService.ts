@@ -26,13 +26,12 @@ async function createPersonInCharge(
 }
 
 async function getPersonInChargeByCompanyId(
-  companyId: string,
+  companyId: number,
   dbClient: PrismaClient
 ) {
-  const parsedCompanyId = parseInt(companyId);
   const result = await dbClient.personInCharge.findMany({
     where: {
-      companyId: parsedCompanyId,
+      companyId: companyId,
     },
   });
   if (result) {

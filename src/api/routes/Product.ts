@@ -1,28 +1,20 @@
 import { PrismaClient } from ".prisma/client";
-import {
-  createPersonInCharge,
-  getPersonInChargeByCompanyId,
-} from "@/services/PersonInChargeService";
-import { CreatePersonInChargeRequest } from "@/types/PersonInCharge";
 import { Router } from "express";
 
+import { CreateProductRequest } from "@/types/Product";
 import { auth } from "../middlewares/Auth";
+import { createProducts, getProductsByCompanyId } from "@/services/Product";
 
 const route = Router();
 
 export default (app: Router, dbClient: PrismaClient) => {
-  app.use("/pic", route);
+  app.use("/product", route);
 
   route.post("/:companyId", auth, async (req, res, next) => {
-    const request = req.body as CreatePersonInChargeRequest;
+    const request = req.body as CreateProductRequest;
     const parsedCompanyId = parseInt(req.params.companyId);
     try {
-      const result = await createPersonInCharge(
-        request,
-        dbClient,
-        req.user._id,
-        parsedCompanyId
-      );
+      const result = await createProducts(request, dbClient, parsedCompanyId);
       return res.json(result);
     } catch (err) {
       next(err);
@@ -30,13 +22,12 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.get("/:companyId", auth, async (req, res, next) => {
-    const companyId = parseInt(req.params.companyId);
     try {
-      const pics = await getPersonInChargeByCompanyId(
-        companyId,
+      const products = await getProductsByCompanyId(
+        req.params.companyId,
         dbClient
       );
-      return res.json(pics);
+      return res.json(products);
     } catch (err) {
       next(err);
     }
