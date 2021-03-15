@@ -26,7 +26,6 @@ async function getCompanyById(companyId: string, dbClient: PrismaClient) {
       id: parsedCompanyId,
     },
   });
-  console.log("QUERY RESULT", company);
   if (company) {
     return company;
   }
