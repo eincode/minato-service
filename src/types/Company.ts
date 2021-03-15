@@ -10,7 +10,6 @@ type CreateCompanyRequest = {
   website: string;
   email: string;
   phone: string;
-  category: string;
   request: string;
   img?: string;
 };

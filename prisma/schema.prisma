@@ -34,7 +34,6 @@ model Company {
   website        String
   email          String
   phone          String
-  category       String
   request        String
   img            String?
   user           User            @relation(fields: [userId], references: [id])

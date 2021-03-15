@@ -32,4 +32,8 @@ export default (app: Router, dbClient: PrismaClient) => {
       next(err);
     }
   });
+
+  // route.post("/finalize", auth, async (req, res, next) => {
+
+  // })
 };
