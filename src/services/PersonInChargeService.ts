@@ -1,14 +1,21 @@
 import { PrismaClient } from ".prisma/client";
+import { v4 as uuid } from "uuid";
+
 import { CreatePersonInChargeRequest } from "@/types/PersonInCharge";
+import { saveImage } from "@/utils/Utils";
 
 async function createPersonInCharge(
   pic: CreatePersonInChargeRequest,
   dbClient: PrismaClient,
-  userId: number,
-  companyId: number
+  userId: string,
+  companyId: string
 ) {
+  const id = uuid();
+  const img = pic.img ? saveImage(pic.img, "PersonInCharge", id) : null;
   const picResult = await dbClient.personInCharge.create({
     data: {
+      id,
+      img,
       ...pic,
       company: {
         connect: {
@@ -26,7 +33,7 @@ async function createPersonInCharge(
 }
 
 async function getPersonInChargeByCompanyId(
-  companyId: number,
+  companyId: string,
   dbClient: PrismaClient
 ) {
   const result = await dbClient.personInCharge.findMany({

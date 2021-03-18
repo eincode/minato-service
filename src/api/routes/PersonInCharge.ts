@@ -15,13 +15,13 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.post("/:companyId", auth, async (req, res, next) => {
     const request = req.body as CreatePersonInChargeRequest;
-    const parsedCompanyId = parseInt(req.params.companyId);
+    const companyId = req.params.companyId;
     try {
       const result = await createPersonInCharge(
         request,
         dbClient,
         req.user._id,
-        parsedCompanyId
+        companyId
       );
       return res.json(result);
     } catch (err) {
@@ -30,7 +30,7 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.get("/:companyId", auth, async (req, res, next) => {
-    const companyId = parseInt(req.params.companyId);
+    const companyId = req.params.companyId;
     try {
       const pics = await getPersonInChargeByCompanyId(
         companyId,

@@ -18,7 +18,7 @@ enum Role {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
+  id             String          @id
   email          String          @unique
   password       String
   role           Role            @default(UNSPECIFIED)
@@ -27,7 +27,7 @@ model User {
 }
 
 model Company {
-  id             Int             @id @default(autoincrement())
+  id             String          @id
   country        String
   name           String
   type           String
@@ -38,7 +38,7 @@ model Company {
   request        String
   img            String?
   user           User            @relation(fields: [userId], references: [id])
-  userId         Int
+  userId         String
   createdAt      DateTime        @default(now())
   personInCharge PersonInCharge? @relation(name: "company")
   products       Product[]
@@ -46,23 +46,22 @@ model Company {
 }
 
 model PersonInCharge {
-  id           Int            @id @default(autoincrement())
-  name         String
+  id           String         @id
   nationality  String
   email        String
   phone        String
   img          String?
   company      Company        @relation(name: "company", fields: [companyId], references: [id])
-  companyId    Int
+  companyId    String
   SavedCompany SavedCompany[]
   user         User           @relation(fields: [userId], references: [id])
-  userId       Int
+  userId       String
 }
 
 model SavedCompany {
   id               Int            @id @default(autoincrement())
   personInCharge   PersonInCharge @relation(fields: [personInChargeId], references: [id])
-  personInChargeId Int            @unique
+  personInChargeId String         @unique
   companies        Company[]
 }
 
@@ -75,5 +74,5 @@ model Product {
   isHalal              Boolean
   minimumOrderQuantity String
   company              Company @relation(fields: [companyId], references: [id])
-  companyId            Int
+  companyId            String
 }

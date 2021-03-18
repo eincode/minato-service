@@ -2,6 +2,7 @@ import { LoginRequest, RegisterRequest } from "@/types/User";
 import { PrismaClient, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { v4 as uuid } from "uuid";
 
 import config from "@/config";
 
@@ -32,9 +33,10 @@ async function signUp(user: RegisterRequest, dbClient: PrismaClient) {
   }
 
   const hashedPassword = await hashPassword(user.password);
-  console.log(hashedPassword);
+  const id = uuid();
   const createdUser = await dbClient.user.create({
     data: {
+      id,
       email: user.email,
       password: hashedPassword,
     },

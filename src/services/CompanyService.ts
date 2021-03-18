@@ -1,15 +1,21 @@
 import { PrismaClient } from ".prisma/client";
+import { v4 as uuid } from "uuid";
+
 import { CreateCompanyRequest } from "@/types/Company";
-import { createError } from "@/utils/Utils";
+import { createError, saveImage } from "@/utils/Utils";
 import { getPersonInChargeByCompanyId } from "./PersonInChargeService";
 
 async function createCompany(
   company: CreateCompanyRequest,
   dbClient: PrismaClient,
-  userId: number
+  userId: string
 ) {
+  const id = uuid();
+  const img = company.img ? saveImage(company.img, "Company", id) : null;
   const companyResult = await dbClient.company.create({
     data: {
+      id,
+      img,
       ...company,
       user: {
         connect: {
@@ -21,7 +27,7 @@ async function createCompany(
   return companyResult;
 }
 
-async function getMyCompany(userId: number, dbClient: PrismaClient) {
+async function getMyCompany(userId: string, dbClient: PrismaClient) {
   const company = await dbClient.company.findFirst({
     where: {
       userId: userId,
@@ -31,10 +37,9 @@ async function getMyCompany(userId: number, dbClient: PrismaClient) {
 }
 
 async function getCompanyById(companyId: string, dbClient: PrismaClient) {
-  const parsedCompanyId = parseInt(companyId);
   const company = await dbClient.company.findUnique({
     where: {
-      id: parsedCompanyId,
+      id: companyId,
     },
   });
   if (company) {
@@ -47,9 +52,9 @@ async function getCompanyById(companyId: string, dbClient: PrismaClient) {
 }
 
 async function saveCompany(
-  companyId: number,
+  companyId: string,
   dbClient: PrismaClient,
-  userId: number
+  userId: string
 ) {
   const company = await getMyCompany(userId, dbClient);
   if (!company) {
@@ -87,7 +92,7 @@ async function saveCompany(
   return savedCompany;
 }
 
-async function getSavedCompany(userId: number, dbClient: PrismaClient) {
+async function getSavedCompany(userId: string, dbClient: PrismaClient) {
   const pic = await dbClient.personInCharge.findFirst({
     where: {
       userId: userId,

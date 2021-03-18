@@ -21,7 +21,7 @@ type CompleteProfileRequest = {
 };
 
 type SaveCompanyRequest = {
-  companyId: number;
+  companyId: string;
 };
 
 type Company = CreateCompanyRequest & {

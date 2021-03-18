@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 async function getUserById(id: string, dbClient: PrismaClient) {
   const user = await dbClient.user.findUnique({
     where: {
-      id: parseInt(id),
+      id,
     },
   });
   if (!user) {
@@ -25,7 +25,7 @@ async function updateUserRole(
 ) {
   const user = await dbClient.user.update({
     where: {
-      id: parseInt(userId),
+      id: userId,
     },
     data: {
       role: role,
