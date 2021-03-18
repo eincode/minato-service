@@ -7,7 +7,7 @@ import { injectKeyToArray, saveImage } from "@/utils/Utils";
 async function createProducts(
   products: CreateProductRequest,
   dbClient: PrismaClient,
-  companyId: number
+  companyId: string
 ) {
   const injectedProductWithCompanyId = injectKeyToArray(
     "companyId",
@@ -19,8 +19,8 @@ async function createProducts(
     const img = product.img ? saveImage(product.img, "Product", id) : null;
     return {
       id,
-      img,
       ...product,
+      img,
     };
   });
   const productsResult = await dbClient.product.createMany({

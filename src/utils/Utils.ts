@@ -29,7 +29,7 @@ function saveImage(imageData: string, type: ImageType, id: string) {
   const path = `images/${imageFolder}/${id}.jpg`;
   const base64Data = imageData.replace(/^data:([A-Za-z-+/]+);base64,/, "");
   
-  fs.writeFileSync(path, base64Data, {encoding: "base64"});
+  fs.writeFileSync(`public/${path}`, base64Data, {encoding: "base64"});
   return `/static/${path}`;
 }
 

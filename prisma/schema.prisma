@@ -47,6 +47,7 @@ model Company {
 
 model PersonInCharge {
   id           String         @id
+  name         String
   nationality  String
   email        String
   phone        String
@@ -66,7 +67,7 @@ model SavedCompany {
 }
 
 model Product {
-  id                   Int     @id @default(autoincrement())
+  id                   String     @id
   category             String
   name                 String
   description          String

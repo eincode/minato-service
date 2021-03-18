@@ -12,9 +12,9 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.post("/:companyId", auth, async (req, res, next) => {
     const request = req.body as CreateProductRequest;
-    const parsedCompanyId = parseInt(req.params.companyId);
+    const companyId = req.params.companyId;
     try {
-      const result = await createProducts(request, dbClient, parsedCompanyId);
+      const result = await createProducts(request, dbClient, companyId);
       return res.json(result);
     } catch (err) {
       next(err);

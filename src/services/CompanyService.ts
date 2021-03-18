@@ -15,8 +15,8 @@ async function createCompany(
   const companyResult = await dbClient.company.create({
     data: {
       id,
-      img,
       ...company,
+      img,
       user: {
         connect: {
           id: userId,

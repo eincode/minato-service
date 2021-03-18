@@ -15,8 +15,8 @@ async function createPersonInCharge(
   const picResult = await dbClient.personInCharge.create({
     data: {
       id,
-      img,
       ...pic,
+      img,
       company: {
         connect: {
           id: companyId,
