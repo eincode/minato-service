@@ -7,6 +7,7 @@ if (envFound.error) {
 
 export default {
   port: parseInt(process.env.PORT || "8080", 10),
+  httpsPort: parseInt(process.env.HTTPS_PORT || "8081", 10),
   databaseUrl: process.env.DATABASE_URL,
   api: {
     prefix: "/api",
