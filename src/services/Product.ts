@@ -1,8 +1,8 @@
 import { PrismaClient } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
-import { CreateProductRequest } from "@/types/Product";
-import { injectKeyToArray, saveImage } from "@/utils/Utils";
+import { CreateProductRequest, ProductRequest } from "@/types/Product";
+import { injectKeyToArray, saveMultipleImages } from "@/utils/Utils";
 
 async function createProducts(
   products: CreateProductRequest,
@@ -14,15 +14,19 @@ async function createProducts(
     companyId,
     products
   );
-  const productsWithImg = injectedProductWithCompanyId.map((product) => {
-    const id = uuid();
-    const img = product.img ? saveImage(product.img, "Product", id) : null;
-    return {
-      id,
-      ...product,
-      img,
-    };
-  });
+  const productsWithImg = injectedProductWithCompanyId.map(
+    (product: ProductRequest & { companyId: string }) => {
+      const id = uuid();
+      const img = product.img
+        ? saveMultipleImages(product.img, "Product")
+        : undefined;
+      return {
+        id,
+        ...product,
+        img,
+      };
+    }
+  );
   const productsResult = await dbClient.product.createMany({
     data: productsWithImg,
   });

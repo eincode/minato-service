@@ -67,13 +67,13 @@ model SavedCompany {
 }
 
 model Product {
-  id                   String     @id
+  id                   String         @id
   category             String
   name                 String
   description          String
-  img                  String?
+  img                  String[]
   isHalal              Boolean
   minimumOrderQuantity String
-  company              Company @relation(fields: [companyId], references: [id])
+  company              Company        @relation(fields: [companyId], references: [id])
   companyId            String
 }

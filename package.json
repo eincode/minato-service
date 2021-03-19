@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "node ./bin/app.js",
     "dev": "npx nodemon",
-    "migrate": "npx prisma migrate dev --name init --preview-feature"
+    "migrate": "npx prisma migrate dev --name init --preview-feature",
+    "generatePrisma": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^2.18.0",

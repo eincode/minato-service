@@ -1,13 +1,15 @@
 import { Company } from "./Company";
 
-type CreateProductRequest = Array<{
+type ProductRequest = {
   category: string;
   name: string;
   description: string;
-  img?: string;
+  img?: Array<string>;
   isHalal: boolean;
   minimumOrderQuantity: string;
-}>;
+};
+
+type CreateProductRequest = Array<ProductRequest>;
 
 type Product = CreateProductRequest & {
   id: number;
@@ -15,4 +17,4 @@ type Product = CreateProductRequest & {
   companyId: number;
 };
 
-export type { CreateProductRequest, Product };
+export type { CreateProductRequest, Product, ProductRequest };
