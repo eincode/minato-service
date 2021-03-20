@@ -3,12 +3,25 @@ import { Router } from "express";
 
 import { CreateProductRequest } from "@/types/Product";
 import { auth } from "../middlewares/Auth";
-import { createProducts, getProductsByCompanyId } from "@/services/Product";
+import {
+  createProducts,
+  getAllProducts,
+  getProductsByCompanyId,
+} from "@/services/Product";
 
 const route = Router();
 
 export default (app: Router, dbClient: PrismaClient) => {
   app.use("/product", route);
+
+  route.get("/all", auth, async (_, res, next) => {
+    try {
+      const result = await getAllProducts(dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
 
   route.post("/:companyId", auth, async (req, res, next) => {
     const request = req.body as CreateProductRequest;

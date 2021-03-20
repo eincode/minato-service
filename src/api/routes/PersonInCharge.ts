@@ -15,10 +15,8 @@ export default (app: Router, dbClient: PrismaClient) => {
   app.use("/pic", route);
 
   route.get("/all", auth, async (_, res, next) => {
-    console.log("GET ALL PERSONS IN CHARGE");
     try {
       const pics = await getAllPersonsInCharge(dbClient);
-      console.log(`RESULT ${JSON.stringify(pics)}`);
       return res.json(pics);
     } catch (err) {
       next(err);

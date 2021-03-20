@@ -45,4 +45,18 @@ async function getProductsByCompanyId(
   return products;
 }
 
-export { createProducts, getProductsByCompanyId };
+async function getAllProducts(dbClient: PrismaClient) {
+  const products = await dbClient.product.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      isHalal: true,
+      minimumOrderQuantity: true,
+      companyId: true,
+    },
+  });
+  return products;
+}
+
+export { createProducts, getProductsByCompanyId, getAllProducts };
