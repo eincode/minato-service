@@ -2,7 +2,7 @@ import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 
 import { auth } from "../middlewares/Auth";
-import { updateUserRole } from "@/services/UserService";
+import { getAllUsers, updateUserRole } from "@/services/UserService";
 import { UpdateRoleRequest } from "@/types/User";
 
 const route = Router();
@@ -33,7 +33,12 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  // route.post("/finalize", auth, async (req, res, next) => {
-
-  // })
+  route.get("/all", auth, async (_, res, next) => {
+    try {
+      const result = await getAllUsers(dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
 };

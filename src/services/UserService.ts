@@ -38,4 +38,15 @@ async function updateUserRole(
   };
 }
 
-export { getUserById, updateUserRole };
+async function getAllUsers(dbClient: PrismaClient) {
+  const users = await dbClient.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      role: true,
+    },
+  });
+  return users;
+}
+
+export { getUserById, updateUserRole, getAllUsers };
