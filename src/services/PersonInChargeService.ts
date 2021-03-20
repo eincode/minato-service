@@ -58,7 +58,7 @@ async function getAllPersonsInCharge(dbClient: PrismaClient) {
       email: true,
       nationality: true,
       phone: true,
-      // companyId: true,
+      companyId: true,
     },
   });
   console.log(result);
