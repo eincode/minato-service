@@ -50,4 +50,23 @@ async function getPersonInChargeByCompanyId(
   throw error;
 }
 
-export { createPersonInCharge, getPersonInChargeByCompanyId };
+async function getAllPersonsInCharge(dbClient: PrismaClient) {
+  const result = await dbClient.personInCharge.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      nationality: true,
+      phone: true,
+      // companyId: true,
+    },
+  });
+  console.log(result);
+  return result;
+}
+
+export {
+  createPersonInCharge,
+  getPersonInChargeByCompanyId,
+  getAllPersonsInCharge,
+};
