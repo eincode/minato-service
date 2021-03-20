@@ -115,10 +115,26 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
   return savedCompanies;
 }
 
+async function getAllCompanies(dbClient: PrismaClient) {
+  const companies = await dbClient.company.findMany({
+    select: {
+      address: true,
+      country: true,
+      name: true,
+      email: true,
+      id: true,
+      userId: true,
+      type: true,
+    },
+  });
+  return companies;
+}
+
 export {
   createCompany,
   getCompanyById,
   saveCompany,
   getSavedCompany,
   getMyCompany,
+  getAllCompanies,
 };

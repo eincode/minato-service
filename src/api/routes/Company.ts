@@ -5,6 +5,7 @@ import { CreateCompanyRequest, SaveCompanyRequest } from "@/types/Company";
 import { auth } from "../middlewares/Auth";
 import {
   createCompany,
+  getAllCompanies,
   getCompanyById,
   getMyCompany,
   getSavedCompany,
@@ -62,6 +63,15 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/saved", auth, async (req, res, next) => {
     try {
       const result = await getSavedCompany(req.user._id, dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/all", auth, async (_, res, next) => {
+    try {
+      const result = await getAllCompanies(dbClient);
       return res.json(result);
     } catch (err) {
       next(err);
