@@ -65,6 +65,9 @@ async function saveCompany(
     dbClient
   );
   const personInCharge = personInChargeQuery[0];
+  if (!personInCharge) {
+    throw createError("BadRequest", "Please create person in charge first");
+  }
   const savedCompany = await dbClient.savedCompany.upsert({
     where: {
       personInChargeId: personInCharge.id,
@@ -115,6 +118,11 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
   return savedCompanies;
 }
 
+async function getAllCompaniesRaw(dbClient: PrismaClient) {
+  const companies = await dbClient.company.findMany();
+  return companies;
+}
+
 async function getAllCompanies(dbClient: PrismaClient) {
   const companies = await dbClient.company.findMany({
     select: {
@@ -137,4 +145,5 @@ export {
   getSavedCompany,
   getMyCompany,
   getAllCompanies,
+  getAllCompaniesRaw,
 };

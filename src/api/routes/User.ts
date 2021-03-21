@@ -2,7 +2,11 @@ import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 
 import { auth } from "../middlewares/Auth";
-import { getAllUsers, updateUserRole } from "@/services/UserService";
+import {
+  getAllUsers,
+  updateUserProductCategories,
+  updateUserRole,
+} from "@/services/UserService";
 import { UpdateRoleRequest } from "@/types/User";
 
 const route = Router();
@@ -25,6 +29,21 @@ export default (app: Router, dbClient: PrismaClient) => {
       const result = await updateUserRole(
         userId.toString(),
         request.role,
+        dbClient
+      );
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/update-categories", auth, async (req, res, next) => {
+    const request = req.body.categories as Array<string>;
+    try {
+      const userId = req.user._id;
+      const result = await updateUserProductCategories(
+        userId,
+        request,
         dbClient
       );
       return res.json(result);

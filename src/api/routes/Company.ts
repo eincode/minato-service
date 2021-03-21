@@ -12,6 +12,7 @@ import {
   saveCompany,
 } from "@/services/CompanyService";
 import { getCompanyByProductCategory } from "@/services/Product";
+import { getUserById } from "@/services/UserService";
 
 const route = Router();
 
@@ -70,15 +71,22 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  route.post("/home", auth, async (req, res, next) => {
-    const category = req.body.categories as Array<string>;
+  route.get("/home", auth, async (req, res, next) => {
+    const userId = req.user._id;
     try {
-      const result = await getCompanyByProductCategory(category, dbClient);
+      const user = await getUserById(userId, dbClient);
+      const myCompany = await getMyCompany(userId, dbClient);
+      const companyId = myCompany?.id ?? "";
+      const result = await getCompanyByProductCategory(
+        companyId,
+        user.productCategories,
+        dbClient
+      );
       return res.json(result);
     } catch (err) {
       next(err);
     }
-  })
+  });
 
   route.get("/all", auth, async (_, res, next) => {
     try {

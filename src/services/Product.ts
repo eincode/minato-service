@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 
 import { CreateProductRequest, ProductRequest } from "@/types/Product";
 import { injectKeyToArray, saveMultipleImages } from "@/utils/Utils";
+import { getAllCompaniesRaw } from "./CompanyService";
 
 async function createProducts(
   products: CreateProductRequest,
@@ -46,31 +47,45 @@ async function getProductsByCompanyId(
 }
 
 async function getCompanyByProductCategory(
+  companyId: string,
   category: Array<string>,
   dbClient: PrismaClient
 ) {
-  const filters = category.map((category) => ({
-    category: category,
-  }));
-  const products = await dbClient.product.findMany({
-    where: {
-      OR: filters,
-    },
-    include: {
-      company: true,
-    },
-  });
-  const companies = products.map((product) => product.company);
-  const filteredCompanies: Company[] = [];
-  companies.forEach((company) => {
-    const isCompanyExist = filteredCompanies.find(
-      (companyRaw) => companyRaw.id === company.id
-    );
-    if (!isCompanyExist) {
-      filteredCompanies.push(company);
+  if (category.length > 0) {
+    const filters = category.map((category) => ({
+      category: category,
+    }));
+    const products = await dbClient.product.findMany({
+      where: {
+        OR: filters,
+      },
+      include: {
+        company: true,
+      },
+    });
+    const companies = products.map((product) => product.company);
+    const filteredCompanies: Company[] = [];
+    companies.forEach((company) => {
+      const isCompanyExist = filteredCompanies.find(
+        (companyRaw) => companyRaw.id === company.id
+      );
+      if (!isCompanyExist && company.id !== companyId) {
+        filteredCompanies.push(company);
+      }
+    });
+    if (filteredCompanies.length < 3) {
+      const result = await getAllCompaniesRaw(dbClient);
+      const filteredResult = result.filter(
+        (company) => company.id !== companyId
+      );
+      return filteredResult;
     }
-  });
-  return filteredCompanies;
+    return filteredCompanies;
+  } else {
+    const result = await getAllCompaniesRaw(dbClient);
+    const filteredResult = result.filter((company) => company.id !== companyId);
+    return filteredResult;
+  }
 }
 
 async function getAllProducts(dbClient: PrismaClient) {

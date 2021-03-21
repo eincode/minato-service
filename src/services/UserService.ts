@@ -15,6 +15,7 @@ async function getUserById(id: string, dbClient: PrismaClient) {
   return {
     id: user.id,
     email: user.email,
+    productCategories: user.productCategory,
   };
 }
 
@@ -38,6 +39,27 @@ async function updateUserRole(
   };
 }
 
+async function updateUserProductCategories(
+  userId: string,
+  categories: Array<string>,
+  dbClient: PrismaClient
+) {
+  const user = await dbClient.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      productCategory: categories,
+    },
+  });
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    productCategories: user.productCategory,
+  };
+}
+
 async function getAllUsers(dbClient: PrismaClient) {
   const users = await dbClient.user.findMany({
     select: {
@@ -49,4 +71,9 @@ async function getAllUsers(dbClient: PrismaClient) {
   return users;
 }
 
-export { getUserById, updateUserRole, getAllUsers };
+export {
+  getUserById,
+  updateUserRole,
+  getAllUsers,
+  updateUserProductCategories,
+};

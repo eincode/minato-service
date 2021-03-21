@@ -18,12 +18,13 @@ enum Role {
 }
 
 model User {
-  id             String          @id
-  email          String          @unique
-  password       String
-  role           Role            @default(UNSPECIFIED)
-  company        Company?
-  PersonInCharge PersonInCharge?
+  id              String          @id
+  email           String          @unique
+  password        String
+  role            Role            @default(UNSPECIFIED)
+  company         Company?
+  PersonInCharge  PersonInCharge?
+  productCategory String[]
 }
 
 model Company {
@@ -67,13 +68,13 @@ model SavedCompany {
 }
 
 model Product {
-  id                   String         @id
+  id                   String   @id
   category             String
   name                 String
   description          String
   img                  String[]
   isHalal              Boolean
   minimumOrderQuantity String
-  company              Company        @relation(fields: [companyId], references: [id])
+  company              Company  @relation(fields: [companyId], references: [id])
   companyId            String
 }
