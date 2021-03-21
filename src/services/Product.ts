@@ -46,12 +46,15 @@ async function getProductsByCompanyId(
 }
 
 async function getCompanyByProductCategory(
-  category: string,
+  category: Array<string>,
   dbClient: PrismaClient
 ) {
+  const filters = category.map((category) => ({
+    category: category,
+  }));
   const products = await dbClient.product.findMany({
     where: {
-      category: category,
+      OR: filters,
     },
     include: {
       company: true,

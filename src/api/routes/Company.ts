@@ -70,8 +70,8 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  route.get("/home", auth, async (req, res, next) => {
-    const category = req.query.category as string;
+  route.post("/home", auth, async (req, res, next) => {
+    const category = req.body.categories as Array<string>;
     try {
       const result = await getCompanyByProductCategory(category, dbClient);
       return res.json(result);
