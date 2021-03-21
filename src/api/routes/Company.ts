@@ -11,6 +11,7 @@ import {
   getSavedCompany,
   saveCompany,
 } from "@/services/CompanyService";
+import { getCompanyByProductCategory } from "@/services/Product";
 
 const route = Router();
 
@@ -68,6 +69,16 @@ export default (app: Router, dbClient: PrismaClient) => {
       next(err);
     }
   });
+
+  route.get("/home", auth, async (req, res, next) => {
+    const category = req.query.category as string;
+    try {
+      const result = await getCompanyByProductCategory(category, dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  })
 
   route.get("/all", auth, async (_, res, next) => {
     try {

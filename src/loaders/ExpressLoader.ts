@@ -15,7 +15,13 @@ async function loadExpress(app: Express, dbClient: PrismaClient) {
     res.status(200).end();
   });
 
-  app.use(express.urlencoded({ extended: false }));
+  app.use(
+    express.urlencoded({
+      limit: "20mb",
+      extended: false,
+      parameterLimit: 50000,
+    })
+  );
   app.use(express.json({ limit: "20mb" }));
 
   app.use(morgan("dev"));

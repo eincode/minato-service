@@ -26,7 +26,6 @@ export default (app: Router, dbClient: PrismaClient) => {
       const result = await login(user, dbClient);
       res.status(200).json(result);
     } catch (err) {
-      console.log(err.message);
       next(err);
     }
   });

@@ -9,7 +9,9 @@ type ProductRequest = {
   minimumOrderQuantity: string;
 };
 
-type CreateProductRequest = Array<ProductRequest>;
+type CreateProductRequest = {
+  products: Array<ProductRequest>;
+};
 
 type Product = CreateProductRequest & {
   id: number;

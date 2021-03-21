@@ -1,4 +1,4 @@
-import { PrismaClient } from ".prisma/client";
+import { Company, PrismaClient } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
 import { CreateProductRequest, ProductRequest } from "@/types/Product";
@@ -12,7 +12,7 @@ async function createProducts(
   const injectedProductWithCompanyId = injectKeyToArray(
     "companyId",
     companyId,
-    products
+    products.products
   );
   const productsWithImg = injectedProductWithCompanyId.map(
     (product: ProductRequest & { companyId: string }) => {
@@ -45,6 +45,31 @@ async function getProductsByCompanyId(
   return products;
 }
 
+async function getCompanyByProductCategory(
+  category: string,
+  dbClient: PrismaClient
+) {
+  const products = await dbClient.product.findMany({
+    where: {
+      category: category,
+    },
+    include: {
+      company: true,
+    },
+  });
+  const companies = products.map((product) => product.company);
+  const filteredCompanies: Company[] = [];
+  companies.forEach((company) => {
+    const isCompanyExist = filteredCompanies.find(
+      (companyRaw) => companyRaw.id === company.id
+    );
+    if (!isCompanyExist) {
+      filteredCompanies.push(company);
+    }
+  });
+  return filteredCompanies;
+}
+
 async function getAllProducts(dbClient: PrismaClient) {
   const products = await dbClient.product.findMany({
     select: {
@@ -59,4 +84,9 @@ async function getAllProducts(dbClient: PrismaClient) {
   return products;
 }
 
-export { createProducts, getProductsByCompanyId, getAllProducts };
+export {
+  createProducts,
+  getProductsByCompanyId,
+  getAllProducts,
+  getCompanyByProductCategory,
+};
