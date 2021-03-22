@@ -66,6 +66,7 @@ async function getAllUsers(dbClient: PrismaClient) {
       id: true,
       email: true,
       role: true,
+      productCategory: true
     },
   });
   return users;
