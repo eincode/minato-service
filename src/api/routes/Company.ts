@@ -97,7 +97,8 @@ export default (app: Router, dbClient: PrismaClient) => {
         categoriesFilter,
         dbClient
       );
-      return res.json(result);
+      const filteredResult = result.filter(company => company?.id !== companyId);
+      return res.json(filteredResult);
     } catch (err) {
       next(err);
     }

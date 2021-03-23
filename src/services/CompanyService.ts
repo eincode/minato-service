@@ -155,7 +155,15 @@ async function getBuyerCompaniesByCategories(
       company: true,
     },
   });
-  return companies;
+  const flattenedCompanies = companies
+    .map((company) => company.company)
+    .filter((company) => {
+      if (company) {
+        return true;
+      }
+      return false;
+    });
+  return flattenedCompanies;
 }
 
 export {
@@ -166,5 +174,5 @@ export {
   getMyCompany,
   getAllCompanies,
   getAllCompaniesRaw,
-  getBuyerCompaniesByCategories
+  getBuyerCompaniesByCategories,
 };
