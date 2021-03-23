@@ -15,6 +15,7 @@ async function getUserById(id: string, dbClient: PrismaClient) {
   return {
     id: user.id,
     email: user.email,
+    role: user.role,
     productCategories: user.productCategory,
   };
 }

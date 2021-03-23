@@ -33,7 +33,10 @@ async function getMyCompany(userId: string, dbClient: PrismaClient) {
       userId: userId,
     },
   });
-  return company;
+  if (company) {
+    return company;
+  }
+  throw createError("BadRequest", "Please create a company first");
 }
 
 async function getCompanyById(companyId: string, dbClient: PrismaClient) {
@@ -138,6 +141,23 @@ async function getAllCompanies(dbClient: PrismaClient) {
   return companies;
 }
 
+async function getBuyerCompaniesByCategories(
+  categories: Array<string>,
+  dbClient: PrismaClient
+) {
+  const companies = await dbClient.user.findMany({
+    where: {
+      productCategory: {
+        hasSome: categories,
+      },
+    },
+    select: {
+      company: true,
+    },
+  });
+  return companies;
+}
+
 export {
   createCompany,
   getCompanyById,
@@ -146,4 +166,5 @@ export {
   getMyCompany,
   getAllCompanies,
   getAllCompaniesRaw,
+  getBuyerCompaniesByCategories
 };

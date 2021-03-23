@@ -102,9 +102,26 @@ async function getAllProducts(dbClient: PrismaClient) {
   return products;
 }
 
+async function getProductCategoriesByCompanyId(
+  companyId: string,
+  dbClient: PrismaClient
+) {
+  const products = await dbClient.product.findMany({
+    where: {
+      companyId,
+    },
+    select: {
+      category: true,
+    },
+  });
+  const productCategories = products.map((product) => product.category);
+  return productCategories;
+}
+
 export {
   createProducts,
   getProductsByCompanyId,
   getAllProducts,
   getCompanyByProductCategory,
+  getProductCategoriesByCompanyId,
 };

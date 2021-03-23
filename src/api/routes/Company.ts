@@ -6,12 +6,16 @@ import { auth } from "../middlewares/Auth";
 import {
   createCompany,
   getAllCompanies,
+  getBuyerCompaniesByCategories,
   getCompanyById,
   getMyCompany,
   getSavedCompany,
   saveCompany,
 } from "@/services/CompanyService";
-import { getCompanyByProductCategory } from "@/services/Product";
+import {
+  getCompanyByProductCategory,
+  getProductCategoriesByCompanyId,
+} from "@/services/Product";
 import { getUserById } from "@/services/UserService";
 
 const route = Router();
@@ -76,10 +80,21 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const user = await getUserById(userId, dbClient);
       const myCompany = await getMyCompany(userId, dbClient);
-      const companyId = myCompany?.id ?? "";
-      const result = await getCompanyByProductCategory(
+      const companyId = myCompany.id;
+      if (user.role === "BUYER") {
+        const result = await getCompanyByProductCategory(
+          companyId,
+          user.productCategories,
+          dbClient
+        );
+        return res.json(result);
+      }
+      const categoriesFilter = await getProductCategoriesByCompanyId(
         companyId,
-        user.productCategories,
+        dbClient
+      );
+      const result = await getBuyerCompaniesByCategories(
+        categoriesFilter,
         dbClient
       );
       return res.json(result);
