@@ -1,4 +1,4 @@
-import { PrismaClient } from ".prisma/client";
+import { PrismaClient, Role } from ".prisma/client";
 import { Router } from "express";
 
 import { CreateCompanyRequest, SaveCompanyRequest } from "@/types/Company";
@@ -7,6 +7,7 @@ import {
   createCompany,
   getAllCompanies,
   getBuyerCompaniesByCategories,
+  getCompaniesByUserRole,
   getCompanyById,
   getMyCompany,
   getSavedCompany,
@@ -47,6 +48,17 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const result = await getMyCompany(req.user._id, dbClient);
       return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/opposites", auth, async (req, res, next) => {
+    try {
+      const user = await getUserById(req.user._id, dbClient);
+      const roleFilter: Role = user.role === "SELLER" ? "BUYER" : "SELLER";
+      const companies = await getCompaniesByUserRole(roleFilter, dbClient);
+      return res.json(companies);
     } catch (err) {
       next(err);
     }
@@ -97,7 +109,9 @@ export default (app: Router, dbClient: PrismaClient) => {
         categoriesFilter,
         dbClient
       );
-      const filteredResult = result.filter(company => company?.id !== companyId);
+      const filteredResult = result.filter(
+        (company) => company?.id !== companyId
+      );
       return res.json(filteredResult);
     } catch (err) {
       next(err);

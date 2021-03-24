@@ -1,4 +1,4 @@
-import { PrismaClient } from ".prisma/client";
+import { PrismaClient, Role } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
 import { CreateCompanyRequest } from "@/types/Company";
@@ -166,6 +166,20 @@ async function getBuyerCompaniesByCategories(
   return flattenedCompanies;
 }
 
+async function getCompaniesByUserRole(role: Role, dbClient: PrismaClient) {
+  const companies = await dbClient.company.findMany({
+    where: {
+      user: {
+        role: role,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
+  return companies;
+}
+
 export {
   createCompany,
   getCompanyById,
@@ -175,4 +189,5 @@ export {
   getAllCompanies,
   getAllCompaniesRaw,
   getBuyerCompaniesByCategories,
+  getCompaniesByUserRole,
 };
