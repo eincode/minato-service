@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { auth } from "../middlewares/Auth";
 import {
   getAllUsers,
+  getUserById,
   updateUserProductCategories,
   updateUserRole,
 } from "@/services/UserService";
@@ -14,12 +15,13 @@ const route = Router();
 export default (app: Router, dbClient: PrismaClient) => {
   app.use("/users", route);
 
-  route.get("/me", auth, (req, res) => {
-    return res
-      .json({
-        user: req.user,
-      })
-      .status(200);
+  route.get("/me", auth, async (req, res, next) => {
+    try {
+      const user = await getUserById(req.user._id, dbClient);
+      return res.json(user);
+    } catch (err) {
+      next(err);
+    }
   });
 
   route.post("/update-role", auth, async (req, res, next) => {

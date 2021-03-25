@@ -36,7 +36,7 @@ async function getPersonInChargeByCompanyId(
   companyId: string,
   dbClient: PrismaClient
 ) {
-  const result = await dbClient.personInCharge.findMany({
+  const result = await dbClient.personInCharge.findFirst({
     where: {
       companyId: companyId,
     },

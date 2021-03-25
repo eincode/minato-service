@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { CreateCompanyRequest } from "@/types/Company";
 import { createError, saveImage } from "@/utils/Utils";
 import { getPersonInChargeByCompanyId } from "./PersonInChargeService";
+import { getProductCategoriesByCompanyId } from "./Product";
 
 async function createCompany(
   company: CreateCompanyRequest,
@@ -40,13 +41,39 @@ async function getMyCompany(userId: string, dbClient: PrismaClient) {
 }
 
 async function getCompanyById(companyId: string, dbClient: PrismaClient) {
+  const userCompany = await dbClient.user.findFirst({
+    where: {
+      company: {
+        id: companyId,
+      },
+    },
+  });
   const company = await dbClient.company.findUnique({
     where: {
       id: companyId,
     },
   });
+  if (userCompany?.role === "SELLER") {
+    const category = await getProductCategoriesByCompanyId(companyId, dbClient);
+    const filteredCategories: Array<string> = [];
+    category.forEach((category) => {
+      const isCategoryExist = filteredCategories.find(
+        (categoryFiltered) => categoryFiltered === category
+      );
+      if (!isCategoryExist) {
+        filteredCategories.push(category);
+      }
+    });
+    return {
+      ...company,
+      category: filteredCategories,
+    };
+  }
   if (company) {
-    return company;
+    return {
+      ...company,
+      category: userCompany?.productCategory,
+    };
   }
 
   const error = new Error("Company Not Found");
@@ -67,7 +94,7 @@ async function saveCompany(
     company.id,
     dbClient
   );
-  const personInCharge = personInChargeQuery[0];
+  const personInCharge = personInChargeQuery;
   if (!personInCharge) {
     throw createError("BadRequest", "Please create person in charge first");
   }
@@ -172,9 +199,6 @@ async function getCompaniesByUserRole(role: Role, dbClient: PrismaClient) {
       user: {
         role: role,
       },
-    },
-    include: {
-      user: true,
     },
   });
   return companies;

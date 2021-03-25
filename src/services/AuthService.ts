@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 
 import config from "@/config";
+import { createError } from "@/utils/Utils";
 
 async function hashPassword(password: string) {
   const salt = await bcrypt.genSalt(parseInt(config.saltFactor));
@@ -29,7 +30,28 @@ async function comparePassword(candidatePassword: string, password: string) {
 
 async function signUp(user: RegisterRequest, dbClient: PrismaClient) {
   if (user.password !== user.confirmationPassword) {
-    throw new Error("Password mismatch!");
+    throw createError("BadRequest", "Password mismatch!");
+  }
+
+  const isUserExist = await dbClient.user.findUnique({
+    where: {
+      email: user.email,
+    },
+  });
+  if (isUserExist) {
+    throw createError("BadRequest", "Email already exists! Please log in");
+  }
+
+  if (user.password.length < 6) {
+    throw createError(
+      "BadRequest",
+      "Password is too short, use at least 6 character password"
+    );
+  }
+
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (!re.test(user.email)) {
+    throw createError("BadRequest", "Invalid email");
   }
 
   const hashedPassword = await hashPassword(user.password);
