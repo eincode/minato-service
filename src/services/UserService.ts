@@ -67,9 +67,14 @@ async function getAllUsers(dbClient: PrismaClient) {
       id: true,
       email: true,
       role: true,
-      productCategory: true
+      productCategory: true,
     },
   });
+  return users;
+}
+
+async function deleteAllUsers(dbClient: PrismaClient) {
+  const users = await dbClient.user.deleteMany();
   return users;
 }
 
@@ -78,4 +83,5 @@ export {
   updateUserRole,
   getAllUsers,
   updateUserProductCategories,
+  deleteAllUsers,
 };

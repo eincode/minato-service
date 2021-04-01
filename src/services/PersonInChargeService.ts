@@ -32,6 +32,24 @@ async function createPersonInCharge(
   return picResult;
 }
 
+async function updatePersonInCharge(
+  picId: string,
+  pic: CreatePersonInChargeRequest,
+  dbClient: PrismaClient
+) {
+  const img = pic.img ? saveImage(pic.img, "PersonInCharge", picId) : undefined;
+  const editedPIC = await dbClient.personInCharge.update({
+    where: {
+      id: picId,
+    },
+    data: {
+      ...pic,
+      img,
+    },
+  });
+  return editedPIC;
+}
+
 async function getPersonInChargeByCompanyId(
   companyId: string,
   dbClient: PrismaClient
@@ -64,8 +82,15 @@ async function getAllPersonsInCharge(dbClient: PrismaClient) {
   return result;
 }
 
+async function deleteAllPics(dbClient: PrismaClient) {
+  const pics = await dbClient.personInCharge.deleteMany();
+  return pics;
+}
+
 export {
   createPersonInCharge,
   getPersonInChargeByCompanyId,
   getAllPersonsInCharge,
+  updatePersonInCharge,
+  deleteAllPics,
 };

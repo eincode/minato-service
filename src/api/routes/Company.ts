@@ -12,6 +12,7 @@ import {
   getMyCompany,
   getSavedCompany,
   saveCompany,
+  updateCompany,
 } from "@/services/CompanyService";
 import {
   getCompanyByProductCategory,
@@ -28,6 +29,17 @@ export default (app: Router, dbClient: PrismaClient) => {
     const request = req.body as CreateCompanyRequest;
     try {
       const result = await createCompany(request, dbClient, req.user._id);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/update", auth, async (req, res, next) => {
+    const request = req.body as CreateCompanyRequest;
+    const companyId = req.query.companyId as string;
+    try {
+      const result = await updateCompany(companyId, request, dbClient);
       return res.json(result);
     } catch (err) {
       next(err);
@@ -92,7 +104,7 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const user = await getUserById(userId, dbClient);
       const myCompany = await getMyCompany(userId, dbClient);
-      const companyId = myCompany.id;
+      const companyId = myCompany.id || '';
       if (user.role === "BUYER") {
         const result = await getCompanyByProductCategory(
           companyId,

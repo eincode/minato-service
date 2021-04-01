@@ -1,12 +1,13 @@
 import { PrismaClient } from ".prisma/client";
 import { Router } from "express";
 
-import { CreateProductRequest } from "@/types/Product";
+import { CreateProductRequest, ProductRequest } from "@/types/Product";
 import { auth } from "../middlewares/Auth";
 import {
   createProducts,
   getAllProducts,
   getProductsByCompanyId,
+  updateProduct,
 } from "@/services/Product";
 import { getMyCompany } from "@/services/CompanyService";
 
@@ -27,8 +28,20 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/me", auth, async (req, res, next) => {
     try {
       const company = await getMyCompany(req.user._id, dbClient);
-      const products = await getProductsByCompanyId(company.id, dbClient);
+      const companyId = company.id || "";
+      const products = await getProductsByCompanyId(companyId, dbClient);
       return res.json(products);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/update", auth, async (req, res, next) => {
+    const request = req.body as ProductRequest;
+    const productId = req.query.productId as string;
+    try {
+      const result = await updateProduct(productId, request, dbClient);
+      return res.json(result);
     } catch (err) {
       next(err);
     }

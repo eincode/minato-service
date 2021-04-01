@@ -4,6 +4,7 @@ import {
   createPersonInCharge,
   getAllPersonsInCharge,
   getPersonInChargeByCompanyId,
+  updatePersonInCharge,
 } from "@/services/PersonInChargeService";
 import { CreatePersonInChargeRequest } from "@/types/PersonInCharge";
 import { Router } from "express";
@@ -27,8 +28,20 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/me", auth, async (req, res, next) => {
     try {
       const company = await getMyCompany(req.user._id, dbClient);
-      const pics = await getPersonInChargeByCompanyId(company.id, dbClient);
+      const companyId = company.id || "";
+      const pics = await getPersonInChargeByCompanyId(companyId, dbClient);
       return res.json(pics);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/update", auth, async (req, res, next) => {
+    const request = req.body as CreatePersonInChargeRequest;
+    const picId = req.query.picId as string;
+    try {
+      const result = await updatePersonInCharge(picId, request, dbClient);
+      return res.json(result);
     } catch (err) {
       next(err);
     }

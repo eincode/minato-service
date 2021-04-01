@@ -28,14 +28,38 @@ async function createCompany(
   return companyResult;
 }
 
+async function updateCompany(
+  companyId: string,
+  company: CreateCompanyRequest,
+  dbClient: PrismaClient
+) {
+  const img = company.img
+    ? saveImage(company.img, "Company", companyId)
+    : undefined;
+  const editedCompany = await dbClient.company.update({
+    where: {
+      id: companyId,
+    },
+    data: {
+      ...company,
+      img,
+    },
+  });
+  return editedCompany;
+}
+
 async function getMyCompany(userId: string, dbClient: PrismaClient) {
   const company = await dbClient.company.findFirst({
     where: {
       userId: userId,
     },
+    select: {
+      id: true,
+    },
   });
   if (company) {
-    return company;
+    const result = await getCompanyById(company.id, dbClient);
+    return result;
   }
   throw createError("BadRequest", "Please create a company first");
 }
@@ -90,8 +114,9 @@ async function saveCompany(
   if (!company) {
     throw createError("BadRequest", "Please create a company first");
   }
+  const myCompanyId = company.id || "";
   const personInChargeQuery = await getPersonInChargeByCompanyId(
-    company.id,
+    myCompanyId,
     dbClient
   );
   const personInCharge = personInChargeQuery;
@@ -204,6 +229,11 @@ async function getCompaniesByUserRole(role: Role, dbClient: PrismaClient) {
   return companies;
 }
 
+async function deleteAllCompanies(dbClient: PrismaClient) {
+  const companies = await dbClient.company.deleteMany();
+  return companies;
+}
+
 export {
   createCompany,
   getCompanyById,
@@ -214,4 +244,6 @@ export {
   getAllCompaniesRaw,
   getBuyerCompaniesByCategories,
   getCompaniesByUserRole,
+  updateCompany,
+  deleteAllCompanies,
 };

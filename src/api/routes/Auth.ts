@@ -4,6 +4,10 @@ import { Router } from "express";
 import { LoginRequest, RegisterRequest } from "@/types/User";
 import { login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
+import { deleteAllCompanies } from "@/services/CompanyService";
+import { deleteAllPics } from "@/services/PersonInChargeService";
+import { deleteAllProducts } from "@/services/Product";
+import { deleteAllUsers } from "@/services/UserService";
 
 const route = Router();
 
@@ -32,5 +36,19 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/me", auth, async (req, res) => {
     res.json(req.user);
+  });
+
+  route.get("/delete-all-data", async (_, res, next) => {
+    try {
+      const result = Promise.all([
+        deleteAllCompanies(dbClient),
+        deleteAllPics(dbClient),
+        deleteAllProducts(dbClient),
+        deleteAllUsers(dbClient),
+      ]);
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
   });
 };
