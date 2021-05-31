@@ -50,6 +50,20 @@ async function updatePersonInCharge(
   return editedPIC;
 }
 
+async function getPersonInChargeByCompanyIdRaw(
+  companyId: string | undefined,
+  dbClient: PrismaClient
+) {
+  if (companyId) {
+    const result = await dbClient.personInCharge.findFirst({
+      where: {
+        companyId: companyId,
+      },
+    });
+    return result;
+  }
+}
+
 async function getPersonInChargeByCompanyId(
   companyId: string | undefined,
   dbClient: PrismaClient
@@ -114,6 +128,7 @@ async function deletePersonInChargeByUserId(
 
 export {
   createPersonInCharge,
+  getPersonInChargeByCompanyIdRaw,
   getPersonInChargeByCompanyId,
   getAllPersonsInCharge,
   updatePersonInCharge,

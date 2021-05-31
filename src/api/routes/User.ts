@@ -13,11 +13,11 @@ import { UpdateRoleRequest } from "@/types/User";
 import {
   deleteCompanyByUserId,
   deleteSavedCompanyByPicId,
-  getMyCompany,
+  getCompanyByUserId,
 } from "@/services/CompanyService";
 import {
   deletePersonInChargeByUserId,
-  getPersonInChargeByCompanyId,
+  getPersonInChargeByCompanyIdRaw,
 } from "@/services/PersonInChargeService";
 import { deleteProductByCompanyId } from "@/services/Product";
 
@@ -77,9 +77,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/delete/:userId", auth, async (req, res, next) => {
     try {
       const userToDelete = await getUserById(req.params.userId, dbClient);
-      const companyToDelete = await getMyCompany(userToDelete.id, dbClient);
+      const companyToDelete = await getCompanyByUserId(userToDelete.id, dbClient);
       if (userToDelete) {
-        const picToDelete = await getPersonInChargeByCompanyId(
+        const picToDelete = await getPersonInChargeByCompanyIdRaw(
           companyToDelete?.id,
           dbClient
         );

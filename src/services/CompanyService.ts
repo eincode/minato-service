@@ -48,6 +48,15 @@ async function updateCompany(
   return editedCompany;
 }
 
+async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
+  const company = await dbClient.company.findFirst({
+    where: {
+      userId,
+    },
+  });
+  return company;
+}
+
 async function getMyCompany(userId: string, dbClient: PrismaClient) {
   const company = await dbClient.company.findFirst({
     where: {
@@ -234,7 +243,10 @@ async function deleteAllCompanies(dbClient: PrismaClient) {
   return companies;
 }
 
-async function deleteCompanyByUserId(userId: string | undefined, dbClient: PrismaClient) {
+async function deleteCompanyByUserId(
+  userId: string | undefined,
+  dbClient: PrismaClient
+) {
   if (userId) {
     const companyToDelete = await dbClient.company.findFirst({
       where: {
@@ -271,6 +283,7 @@ async function deleteSavedCompanyByPicId(
 
 export {
   createCompany,
+  getCompanyByUserId,
   getCompanyById,
   saveCompany,
   getSavedCompany,
