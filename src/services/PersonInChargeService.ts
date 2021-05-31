@@ -51,16 +51,18 @@ async function updatePersonInCharge(
 }
 
 async function getPersonInChargeByCompanyId(
-  companyId: string,
+  companyId: string | undefined,
   dbClient: PrismaClient
 ) {
-  const result = await dbClient.personInCharge.findFirst({
-    where: {
-      companyId: companyId,
-    },
-  });
-  if (result) {
-    return result;
+  if (companyId) {
+    const result = await dbClient.personInCharge.findFirst({
+      where: {
+        companyId: companyId,
+      },
+    });
+    if (result) {
+      return result;
+    }
   }
 
   const error = new Error("Company not found or PIC not exist");
@@ -87,10 +89,34 @@ async function deleteAllPics(dbClient: PrismaClient) {
   return pics;
 }
 
+async function deletePersonInChargeByUserId(
+  userId: string | undefined,
+  dbClient: PrismaClient
+) {
+  if (userId) {
+    const picToDelete = await dbClient.personInCharge.findFirst({
+      where: {
+        userId,
+      },
+    });
+    if (picToDelete) {
+      const pic = await dbClient.personInCharge.delete({
+        where: {
+          id: picToDelete.id,
+        },
+      });
+      return pic;
+    }
+    return null;
+  }
+  return null;
+}
+
 export {
   createPersonInCharge,
   getPersonInChargeByCompanyId,
   getAllPersonsInCharge,
   updatePersonInCharge,
   deleteAllPics,
+  deletePersonInChargeByUserId,
 };

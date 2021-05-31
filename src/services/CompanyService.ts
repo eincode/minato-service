@@ -234,6 +234,41 @@ async function deleteAllCompanies(dbClient: PrismaClient) {
   return companies;
 }
 
+async function deleteCompanyByUserId(userId: string | undefined, dbClient: PrismaClient) {
+  if (userId) {
+    const companyToDelete = await dbClient.company.findFirst({
+      where: {
+        userId,
+      },
+    });
+    if (companyToDelete) {
+      const company = await dbClient.company.delete({
+        where: {
+          id: companyToDelete?.id,
+        },
+      });
+      return company;
+    }
+    return null;
+  }
+  return null;
+}
+
+async function deleteSavedCompanyByPicId(
+  picId: string | undefined,
+  dbClient: PrismaClient
+) {
+  if (picId) {
+    const savedCompanies = await dbClient.savedCompany.deleteMany({
+      where: {
+        personInChargeId: picId,
+      },
+    });
+    return savedCompanies;
+  }
+  return [];
+}
+
 export {
   createCompany,
   getCompanyById,
@@ -246,4 +281,6 @@ export {
   getCompaniesByUserRole,
   updateCompany,
   deleteAllCompanies,
+  deleteCompanyByUserId,
+  deleteSavedCompanyByPicId,
 };

@@ -78,10 +78,23 @@ async function deleteAllUsers(dbClient: PrismaClient) {
   return users;
 }
 
+async function deleteUserById(userId: string, dbClient: PrismaClient) {
+  const user = await dbClient.user.delete({
+    where: {
+      id: userId
+    }
+  });
+  if (user) {
+    return user;
+  }
+  return null;
+}
+
 export {
   getUserById,
   updateUserRole,
   getAllUsers,
   updateUserProductCategories,
   deleteAllUsers,
+  deleteUserById,
 };

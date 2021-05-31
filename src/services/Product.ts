@@ -174,6 +174,30 @@ async function deleteAllProducts(dbClient: PrismaClient) {
   return products;
 }
 
+async function deleteProductById(productId: string, dbClient: PrismaClient) {
+  const product = await dbClient.product.delete({
+    where: {
+      id: productId,
+    },
+  });
+  return product;
+}
+
+async function deleteProductByCompanyId(
+  companyId: string | undefined,
+  dbClient: PrismaClient
+) {
+  if (companyId) {
+    const products = await dbClient.product.deleteMany({
+      where: {
+        companyId,
+      },
+    });
+    return products;
+  }
+  return [];
+}
+
 export {
   createProducts,
   getProductsByCompanyId,
@@ -182,4 +206,6 @@ export {
   getProductCategoriesByCompanyId,
   updateProduct,
   deleteAllProducts,
+  deleteProductById,
+  deleteProductByCompanyId,
 };

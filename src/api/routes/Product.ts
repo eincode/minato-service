@@ -5,6 +5,7 @@ import { CreateProductRequest, ProductRequest } from "@/types/Product";
 import { auth } from "../middlewares/Auth";
 import {
   createProducts,
+  deleteProductById,
   getAllProducts,
   getProductsByCompanyId,
   updateProduct,
@@ -65,6 +66,15 @@ export default (app: Router, dbClient: PrismaClient) => {
         dbClient
       );
       return res.json(products);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/delete/:productId", auth, async (req, res, next) => {
+    try {
+      const product = await deleteProductById(req.params.productId, dbClient);
+      return res.json(product);
     } catch (err) {
       next(err);
     }
