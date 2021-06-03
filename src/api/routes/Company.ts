@@ -9,6 +9,7 @@ import {
   getBuyerCompaniesByCategories,
   getCompaniesByUserRole,
   getCompanyById,
+  getCompanyCategoriesByCompanyId,
   getMyCompany,
   getSavedCompany,
   saveCompany,
@@ -104,7 +105,7 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const user = await getUserById(userId, dbClient);
       const myCompany = await getMyCompany(userId, dbClient);
-      const companyId = myCompany.id || '';
+      const companyId = myCompany.id || "";
       if (user.role === "BUYER") {
         const result = await getCompanyByProductCategory(
           companyId,
@@ -125,6 +126,18 @@ export default (app: Router, dbClient: PrismaClient) => {
         (company) => company?.id !== companyId
       );
       return res.json(filteredResult);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/categories/:companyId", auth, async (req, res, next) => {
+    try {
+      const result = await getCompanyCategoriesByCompanyId(
+        req.params.companyId,
+        dbClient
+      );
+      return res.json(result);
     } catch (err) {
       next(err);
     }

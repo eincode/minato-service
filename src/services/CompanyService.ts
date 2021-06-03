@@ -281,6 +281,22 @@ async function deleteSavedCompanyByPicId(
   return [];
 }
 
+async function getCompanyCategoriesByCompanyId(
+  companyId: string,
+  dbClient: PrismaClient
+) {
+  const products = await dbClient.product.findMany({
+    where: {
+      companyId: companyId,
+    },
+  });
+  if (products.length === 0) {
+    throw createError("BadRequest", "Company not found");
+  }
+  const categories = products.map(product => product.category);
+  return categories;
+};
+
 export {
   createCompany,
   getCompanyByUserId,
@@ -296,4 +312,5 @@ export {
   deleteAllCompanies,
   deleteCompanyByUserId,
   deleteSavedCompanyByPicId,
+  getCompanyCategoriesByCompanyId,
 };
