@@ -12,6 +12,7 @@ import {
   getCompanyByUserId,
 } from "@/services/CompanyService";
 import { deleteProductByCompanyId } from "@/services/Product";
+import { deletePersonInChargeById, getPersonInChargeByCompanyId } from "@/services/PersonInChargeService";
 
 const route = Router();
 
@@ -43,15 +44,21 @@ export default (app: Router, dbClient: PrismaClient) => {
         userToDelete.id,
         dbClient
       );
+      const picToDelete = await getPersonInChargeByCompanyId(
+        companyToDelete.id,
+        dbClient
+      );
       if (userToDelete) {
         const products = await deleteProductByCompanyId(
           companyToDelete?.id,
           dbClient
         );
+        const pic = await deletePersonInChargeById(picToDelete?.id, dbClient)
         const company = await deleteCompanyByUserId(userToDelete.id, dbClient);
         const user = await deleteUserById(userToDelete.id, dbClient);
         return res.json({
           user,
+          pic,
           company,
           products,
         });

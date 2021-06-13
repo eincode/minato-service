@@ -75,10 +75,29 @@ async function deleteAllPics(dbClient: PrismaClient) {
   return pics;
 }
 
+async function deletePersonInChargeById(
+  picId: string | undefined,
+  dbClient: PrismaClient
+) {
+  if (picId) {
+    const pic = await dbClient.personInCharge.delete({
+      where: {
+        id: picId,
+      },
+    });
+    if (pic) {
+      return pic;
+    }
+    return null;
+  }
+  return null;
+}
+
 export {
   createPersonInCharge,
   getPersonInChargeByCompanyId,
   getAllPersonsInCharge,
   updatePersonInCharge,
   deleteAllPics,
+  deletePersonInChargeById,
 };

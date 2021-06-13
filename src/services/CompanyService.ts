@@ -233,6 +233,8 @@ async function getSellerCompaniesByCategories(
 }
 
 async function deleteAllCompanies(dbClient: PrismaClient) {
+  await dbClient.sellerRequest.deleteMany();
+  await dbClient.buyerRequest.deleteMany();
   const companies = await dbClient.company.deleteMany();
   return companies;
 }
@@ -248,6 +250,16 @@ async function deleteCompanyByUserId(
       },
     });
     if (companyToDelete) {
+      await dbClient.sellerRequest.deleteMany({
+        where: {
+          companyId: companyToDelete.id,
+        },
+      });
+      await dbClient.buyerRequest.deleteMany({
+        where: {
+          companyId: companyToDelete.id,
+        },
+      });
       const company = await dbClient.company.delete({
         where: {
           id: companyToDelete?.id,
@@ -256,6 +268,28 @@ async function deleteCompanyByUserId(
       return company;
     }
     return null;
+  }
+  return null;
+}
+
+async function deleteCompanyById(companyId: string, dbClient: PrismaClient) {
+  await dbClient.sellerRequest.deleteMany({
+    where: {
+      companyId,
+    },
+  });
+  await dbClient.buyerRequest.deleteMany({
+    where: {
+      companyId,
+    },
+  });
+  const company = await dbClient.company.delete({
+    where: {
+      id: companyId,
+    },
+  });
+  if (company) {
+    return company;
   }
   return null;
 }
@@ -272,4 +306,5 @@ export {
   updateCompany,
   deleteAllCompanies,
   deleteCompanyByUserId,
+  deleteCompanyById,
 };
