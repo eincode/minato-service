@@ -14,6 +14,7 @@ import {
   saveCompany,
   updateCompany,
 } from "@/services/CompanyService";
+import { createError } from "@/utils/Utils";
 
 const route = Router();
 
@@ -88,6 +89,9 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const userCompany = await getCompanyByUserId(userId, dbClient);
       const categories = userCompany.productCategories;
+      if (categories.length === 0) {
+        throw createError("BadRequest", "You have not setup seller account");
+      }
       const companies = await getBuyerCompaniesByCategories(
         categories,
         dbClient
@@ -106,6 +110,9 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const userCompany = await getCompanyByUserId(userId, dbClient);
       const categories = userCompany.buyingCategories;
+      if (categories.length === 0) {
+        throw createError("BadRequest", "You have not setup buyer account");
+      }
       const companies = await getSellerCompaniesByCategories(
         categories,
         dbClient

@@ -41,6 +41,7 @@ async function createCompany(
     include: {
       requestAsBuyer: true,
       requestAsSeller: true,
+      product: true,
     },
   });
   return result;
@@ -101,6 +102,7 @@ async function updateCompany(
       img,
     },
     include: {
+      product: true,
       requestAsSeller: true,
       requestAsBuyer: true,
     },
@@ -159,7 +161,11 @@ async function saveCompany(
       },
     },
   });
-  return result;
+  if (result) {
+    return { message: "success" };
+  } else {
+    throw createError("BadRequest", "Company not found");
+  }
 }
 
 async function getSavedCompany(userId: string, dbClient: PrismaClient) {
@@ -167,8 +173,14 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
     where: {
       id: userId,
     },
-    select: {
-      savedCompanies: true,
+    include: {
+      savedCompanies: {
+        include: {
+          product: true,
+          requestAsBuyer: true,
+          requestAsSeller: true,
+        },
+      },
     },
   });
   if (!user) {
