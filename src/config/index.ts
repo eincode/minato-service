@@ -10,7 +10,7 @@ export default {
   httpsPort: parseInt(process.env.HTTPS_PORT || "8081", 10),
   databaseUrl: process.env.DATABASE_URL,
   api: {
-    prefix: "/api",
+    prefix: "/api/v2",
   },
   jwtSecret: process.env.JWT_SECRET || "",
   jwtAlgorithm: process.env.JWT_ALGO || "",

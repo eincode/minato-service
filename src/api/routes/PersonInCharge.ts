@@ -1,5 +1,5 @@
 import { PrismaClient } from ".prisma/client";
-import { getMyCompany } from "@/services/CompanyService";
+import { getCompanyByUserId } from "@/services/CompanyService";
 import {
   createPersonInCharge,
   getAllPersonsInCharge,
@@ -27,7 +27,7 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/me", auth, async (req, res, next) => {
     try {
-      const company = await getMyCompany(req.user._id, dbClient);
+      const company = await getCompanyByUserId(req.user._id, dbClient);
       const companyId = company.id || "";
       const pics = await getPersonInChargeByCompanyId(companyId, dbClient);
       return res.json(pics);
@@ -51,12 +51,7 @@ export default (app: Router, dbClient: PrismaClient) => {
     const request = req.body as CreatePersonInChargeRequest;
     const companyId = req.params.companyId;
     try {
-      const result = await createPersonInCharge(
-        request,
-        dbClient,
-        req.user._id,
-        companyId
-      );
+      const result = await createPersonInCharge(request, dbClient, companyId);
       return res.json(result);
     } catch (err) {
       next(err);

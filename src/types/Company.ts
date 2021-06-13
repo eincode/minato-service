@@ -5,13 +5,22 @@ import { User } from "./User";
 type CreateCompanyRequest = {
   country: string;
   name: string;
-  type: string;
+  typeOfIndustry: string;
   address: string;
   website: string;
   email: string;
-  phone: string;
-  request: string;
+  phoneNumber: string;
   img?: string;
+  productCategories: Array<string>;
+  requestAsBuyer: {
+    productName: string;
+    destinationPort: string;
+    paymentMethod: string;
+    other: string;
+  };
+  requestAsSeller: {
+    request: string;
+  };
 };
 
 type CompleteProfileRequest = {

@@ -10,7 +10,7 @@ import {
   getProductsByCompanyId,
   updateProduct,
 } from "@/services/Product";
-import { getMyCompany } from "@/services/CompanyService";
+import { getCompanyByUserId } from "@/services/CompanyService";
 
 const route = Router();
 
@@ -28,7 +28,7 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/me", auth, async (req, res, next) => {
     try {
-      const company = await getMyCompany(req.user._id, dbClient);
+      const company = await getCompanyByUserId(req.user._id, dbClient);
       const companyId = company.id || "";
       const products = await getProductsByCompanyId(companyId, dbClient);
       return res.json(products);

@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from ".prisma/client";
+import { PrismaClient } from ".prisma/client";
 import { Router } from "express";
 
 import { CreateCompanyRequest, SaveCompanyRequest } from "@/types/Company";
@@ -7,19 +7,13 @@ import {
   createCompany,
   getAllCompanies,
   getBuyerCompaniesByCategories,
-  getCompaniesByUserRole,
   getCompanyById,
-  getCompanyCategoriesByCompanyId,
-  getMyCompany,
+  getCompanyByUserId,
   getSavedCompany,
+  getSellerCompaniesByCategories,
   saveCompany,
   updateCompany,
 } from "@/services/CompanyService";
-import {
-  getCompanyByProductCategory,
-  getProductCategoriesByCompanyId,
-} from "@/services/Product";
-import { getUserById } from "@/services/UserService";
 
 const route = Router();
 
@@ -59,19 +53,8 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/me", auth, async (req, res, next) => {
     try {
-      const result = await getMyCompany(req.user._id, dbClient);
+      const result = await getCompanyByUserId(req.user._id, dbClient);
       return res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  route.get("/opposites", auth, async (req, res, next) => {
-    try {
-      const user = await getUserById(req.user._id, dbClient);
-      const roleFilter: Role = user.role === "SELLER" ? "BUYER" : "SELLER";
-      const companies = await getCompaniesByUserRole(roleFilter, dbClient);
-      return res.json(companies);
     } catch (err) {
       next(err);
     }
@@ -100,42 +83,35 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  route.get("/home", auth, async (req, res, next) => {
+  route.get("/home/seller", auth, async (req, res, next) => {
     const userId = req.user._id;
     try {
-      const user = await getUserById(userId, dbClient);
-      const myCompany = await getMyCompany(userId, dbClient);
-      const companyId = myCompany.id || "";
-      if (user.role === "BUYER") {
-        const result = await getCompanyByProductCategory(
-          companyId,
-          user.productCategories,
-          dbClient
-        );
-        return res.json(result);
-      }
-      const categoriesFilter = await getProductCategoriesByCompanyId(
-        companyId,
+      const userCompany = await getCompanyByUserId(userId, dbClient);
+      const categories = userCompany.productCategories;
+      const companies = await getBuyerCompaniesByCategories(
+        categories,
         dbClient
       );
-      const result = await getBuyerCompaniesByCategories(
-        categoriesFilter,
-        dbClient
+      const result = companies.filter(
+        (company) => company.id !== userCompany.id
       );
-      const filteredResult = result.filter(
-        (company) => company?.id !== companyId
-      );
-      return res.json(filteredResult);
+      return res.json(result);
     } catch (err) {
       next(err);
     }
   });
 
-  route.get("/categories/:companyId", auth, async (req, res, next) => {
+  route.get("/home/buyer", auth, async (req, res, next) => {
+    const userId = req.user._id;
     try {
-      const result = await getCompanyCategoriesByCompanyId(
-        req.params.companyId,
+      const userCompany = await getCompanyByUserId(userId, dbClient);
+      const categories = userCompany.buyingCategories;
+      const companies = await getSellerCompaniesByCategories(
+        categories,
         dbClient
+      );
+      const result = companies.filter(
+        (company) => company.id !== userCompany.id
       );
       return res.json(result);
     } catch (err) {

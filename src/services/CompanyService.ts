@@ -1,10 +1,8 @@
-import { PrismaClient, Role } from ".prisma/client";
+import { PrismaClient } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
 import { CreateCompanyRequest } from "@/types/Company";
 import { createError, saveImage } from "@/utils/Utils";
-import { getPersonInChargeByCompanyId } from "./PersonInChargeService";
-import { getProductCategoriesByCompanyId } from "./Product";
 
 async function createCompany(
   company: CreateCompanyRequest,
@@ -13,19 +11,39 @@ async function createCompany(
 ) {
   const id = uuid();
   const img = company.img ? saveImage(company.img, "Company", id) : null;
-  const companyResult = await dbClient.company.create({
+  const result = await dbClient.company.create({
     data: {
       id,
       ...company,
-      img,
       user: {
         connect: {
           id: userId,
         },
       },
+      img,
+      requestAsBuyer: company.requestAsBuyer
+        ? {
+            create: {
+              id: uuid(),
+              ...company.requestAsBuyer,
+            },
+          }
+        : undefined,
+      requestAsSeller: company.requestAsSeller
+        ? {
+            create: {
+              id: uuid(),
+              ...company.requestAsSeller,
+            },
+          }
+        : undefined,
+    },
+    include: {
+      requestAsBuyer: true,
+      requestAsSeller: true,
     },
   });
-  return companyResult;
+  return result;
 }
 
 async function updateCompany(
@@ -36,13 +54,55 @@ async function updateCompany(
   const img = company.img
     ? saveImage(company.img, "Company", companyId)
     : undefined;
+  const requestAsBuyer = await dbClient.buyerRequest.findFirst({
+    where: {
+      companyId,
+    },
+  });
+  const requestAsSeller = await dbClient.buyerRequest.findFirst({
+    where: {
+      companyId,
+    },
+  });
   const editedCompany = await dbClient.company.update({
     where: {
       id: companyId,
     },
     data: {
       ...company,
+      requestAsBuyer: company.requestAsBuyer
+        ? {
+            upsert: {
+              create: {
+                id: uuid(),
+                ...company.requestAsBuyer,
+              },
+              update: {
+                id: requestAsBuyer?.id,
+                ...company.requestAsBuyer,
+              },
+            },
+          }
+        : undefined,
+      requestAsSeller: company.requestAsSeller
+        ? {
+            upsert: {
+              create: {
+                id: uuid(),
+                ...company.requestAsSeller,
+              },
+              update: {
+                id: requestAsSeller?.id,
+                ...company.requestAsSeller,
+              },
+            },
+          }
+        : undefined,
       img,
+    },
+    include: {
+      requestAsSeller: true,
+      requestAsBuyer: true,
     },
   });
   return editedCompany;
@@ -53,65 +113,33 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
     where: {
       userId,
     },
-  });
-  return company;
-}
-
-async function getMyCompany(userId: string, dbClient: PrismaClient) {
-  const company = await dbClient.company.findFirst({
-    where: {
-      userId: userId,
-    },
-    select: {
-      id: true,
+    include: {
+      product: true,
+      requestAsBuyer: true,
+      requestAsSeller: true,
     },
   });
   if (company) {
-    const result = await getCompanyById(company.id, dbClient);
-    return result;
+    return company;
   }
-  throw createError("BadRequest", "Please create a company first");
+  throw createError("BadRequest", "Company doesn't exist");
 }
 
 async function getCompanyById(companyId: string, dbClient: PrismaClient) {
-  const userCompany = await dbClient.user.findFirst({
-    where: {
-      company: {
-        id: companyId,
-      },
-    },
-  });
   const company = await dbClient.company.findUnique({
     where: {
       id: companyId,
     },
+    include: {
+      product: true,
+      requestAsSeller: true,
+      requestAsBuyer: true,
+    },
   });
-  if (userCompany?.role === "SELLER") {
-    const category = await getProductCategoriesByCompanyId(companyId, dbClient);
-    const filteredCategories: Array<string> = [];
-    category.forEach((category) => {
-      const isCategoryExist = filteredCategories.find(
-        (categoryFiltered) => categoryFiltered === category
-      );
-      if (!isCategoryExist) {
-        filteredCategories.push(category);
-      }
-    });
-    return {
-      ...company,
-      category: filteredCategories,
-    };
+  if (!company) {
+    throw createError("BadRequest", "Company not found");
   }
-  if (company) {
-    return {
-      ...company,
-      category: userCompany?.productCategory,
-    };
-  }
-
-  const error = new Error("Company Not Found");
-  error.name = "BadRequest";
-  throw error;
+  return company;
 }
 
 async function saveCompany(
@@ -119,86 +147,38 @@ async function saveCompany(
   dbClient: PrismaClient,
   userId: string
 ) {
-  const company = await getMyCompany(userId, dbClient);
-  if (!company) {
-    throw createError("BadRequest", "Please create a company first");
-  }
-  const myCompanyId = company.id || "";
-  const personInChargeQuery = await getPersonInChargeByCompanyId(
-    myCompanyId,
-    dbClient
-  );
-  const personInCharge = personInChargeQuery;
-  if (!personInCharge) {
-    throw createError("BadRequest", "Please create person in charge first");
-  }
-  const savedCompany = await dbClient.savedCompany.upsert({
+  const result = await dbClient.user.update({
     where: {
-      personInChargeId: personInCharge.id,
+      id: userId,
     },
-    update: {
-      companies: {
+    data: {
+      savedCompanies: {
         connect: {
           id: companyId,
-        },
-      },
-    },
-    create: {
-      companies: {
-        connect: {
-          id: companyId,
-        },
-      },
-      personInCharge: {
-        connect: {
-          id: personInCharge.id,
         },
       },
     },
   });
-  return savedCompany;
+  return result;
 }
 
 async function getSavedCompany(userId: string, dbClient: PrismaClient) {
-  const pic = await dbClient.personInCharge.findFirst({
+  const user = await dbClient.user.findUnique({
     where: {
-      userId: userId,
+      id: userId,
+    },
+    select: {
+      savedCompanies: true,
     },
   });
-  if (!pic) {
-    throw createError(
-      "BadRequest",
-      "Person In Charge not found in the company"
-    );
+  if (!user) {
+    throw createError("BadRequest", "User not found");
   }
-  const savedCompanies = await dbClient.savedCompany.findFirst({
-    where: {
-      personInChargeId: pic.id,
-    },
-    include: {
-      companies: true,
-    },
-  });
-  return savedCompanies;
-}
-
-async function getAllCompaniesRaw(dbClient: PrismaClient) {
-  const companies = await dbClient.company.findMany();
-  return companies;
+  return user.savedCompanies;
 }
 
 async function getAllCompanies(dbClient: PrismaClient) {
-  const companies = await dbClient.company.findMany({
-    select: {
-      address: true,
-      country: true,
-      name: true,
-      email: true,
-      id: true,
-      userId: true,
-      type: true,
-    },
-  });
+  const companies = await dbClient.company.findMany();
   return companies;
 }
 
@@ -206,33 +186,35 @@ async function getBuyerCompaniesByCategories(
   categories: Array<string>,
   dbClient: PrismaClient
 ) {
-  const companies = await dbClient.user.findMany({
+  const companies = await dbClient.company.findMany({
     where: {
-      productCategory: {
+      buyingCategories: {
         hasSome: categories,
       },
     },
-    select: {
-      company: true,
+    include: {
+      requestAsBuyer: true,
+      requestAsSeller: true,
+      product: true,
     },
   });
-  const flattenedCompanies = companies
-    .map((company) => company.company)
-    .filter((company) => {
-      if (company) {
-        return true;
-      }
-      return false;
-    });
-  return flattenedCompanies;
+  return companies;
 }
 
-async function getCompaniesByUserRole(role: Role, dbClient: PrismaClient) {
+async function getSellerCompaniesByCategories(
+  categories: Array<string>,
+  dbClient: PrismaClient
+) {
   const companies = await dbClient.company.findMany({
     where: {
-      user: {
-        role: role,
+      productCategories: {
+        hasSome: categories,
       },
+    },
+    include: {
+      requestAsBuyer: true,
+      requestAsSeller: true,
+      product: true,
     },
   });
   return companies;
@@ -266,51 +248,16 @@ async function deleteCompanyByUserId(
   return null;
 }
 
-async function deleteSavedCompanyByPicId(
-  picId: string | undefined,
-  dbClient: PrismaClient
-) {
-  if (picId) {
-    const savedCompanies = await dbClient.savedCompany.deleteMany({
-      where: {
-        personInChargeId: picId,
-      },
-    });
-    return savedCompanies;
-  }
-  return [];
-}
-
-async function getCompanyCategoriesByCompanyId(
-  companyId: string,
-  dbClient: PrismaClient
-) {
-  const products = await dbClient.product.findMany({
-    where: {
-      companyId: companyId,
-    },
-  });
-  if (products.length === 0) {
-    throw createError("BadRequest", "Company not found");
-  }
-  const categories = products.map(product => product.category);
-  return categories;
-};
-
 export {
   createCompany,
   getCompanyByUserId,
   getCompanyById,
   saveCompany,
   getSavedCompany,
-  getMyCompany,
   getAllCompanies,
-  getAllCompaniesRaw,
   getBuyerCompaniesByCategories,
-  getCompaniesByUserRole,
+  getSellerCompaniesByCategories,
   updateCompany,
   deleteAllCompanies,
   deleteCompanyByUserId,
-  deleteSavedCompanyByPicId,
-  getCompanyCategoriesByCompanyId,
 };

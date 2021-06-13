@@ -7,12 +7,11 @@ import { saveImage } from "@/utils/Utils";
 async function createPersonInCharge(
   pic: CreatePersonInChargeRequest,
   dbClient: PrismaClient,
-  userId: string,
   companyId: string
 ) {
   const id = uuid();
   const img = pic.img ? saveImage(pic.img, "PersonInCharge", id) : null;
-  const picResult = await dbClient.personInCharge.create({
+  const result = await dbClient.personInCharge.create({
     data: {
       id,
       ...pic,
@@ -22,14 +21,9 @@ async function createPersonInCharge(
           id: companyId,
         },
       },
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
     },
   });
-  return picResult;
+  return result;
 }
 
 async function updatePersonInCharge(
@@ -50,38 +44,16 @@ async function updatePersonInCharge(
   return editedPIC;
 }
 
-async function getPersonInChargeByCompanyIdRaw(
-  companyId: string | undefined,
-  dbClient: PrismaClient
-) {
-  if (companyId) {
-    const result = await dbClient.personInCharge.findFirst({
-      where: {
-        companyId: companyId,
-      },
-    });
-    return result;
-  }
-}
-
 async function getPersonInChargeByCompanyId(
-  companyId: string | undefined,
+  companyId: string,
   dbClient: PrismaClient
 ) {
-  if (companyId) {
-    const result = await dbClient.personInCharge.findFirst({
-      where: {
-        companyId: companyId,
-      },
-    });
-    if (result) {
-      return result;
-    }
-  }
-
-  const error = new Error("Company not found or PIC not exist");
-  error.name = "BadRequest";
-  throw error;
+  const result = await dbClient.personInCharge.findFirst({
+    where: {
+      companyId: companyId,
+    },
+  });
+  return result;
 }
 
 async function getAllPersonsInCharge(dbClient: PrismaClient) {
@@ -91,7 +63,7 @@ async function getAllPersonsInCharge(dbClient: PrismaClient) {
       name: true,
       email: true,
       nationality: true,
-      phone: true,
+      phoneNumber: true,
       companyId: true,
     },
   });
@@ -103,35 +75,10 @@ async function deleteAllPics(dbClient: PrismaClient) {
   return pics;
 }
 
-async function deletePersonInChargeByUserId(
-  userId: string | undefined,
-  dbClient: PrismaClient
-) {
-  if (userId) {
-    const picToDelete = await dbClient.personInCharge.findFirst({
-      where: {
-        userId,
-      },
-    });
-    if (picToDelete) {
-      const pic = await dbClient.personInCharge.delete({
-        where: {
-          id: picToDelete.id,
-        },
-      });
-      return pic;
-    }
-    return null;
-  }
-  return null;
-}
-
 export {
   createPersonInCharge,
-  getPersonInChargeByCompanyIdRaw,
   getPersonInChargeByCompanyId,
   getAllPersonsInCharge,
   updatePersonInCharge,
   deleteAllPics,
-  deletePersonInChargeByUserId,
 };

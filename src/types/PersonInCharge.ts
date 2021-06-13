@@ -5,7 +5,7 @@ type CreatePersonInChargeRequest = {
   name: string;
   nationality: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   img?: string;
 };
 

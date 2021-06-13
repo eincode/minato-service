@@ -1,4 +1,4 @@
-import { UserRole } from "@/types/User";
+import { createError } from "@/utils/Utils";
 import { PrismaClient } from "@prisma/client";
 
 async function getUserById(id: string, dbClient: PrismaClient) {
@@ -7,58 +7,13 @@ async function getUserById(id: string, dbClient: PrismaClient) {
       id,
     },
   });
-  if (!user) {
-    const error = new Error("User not exist");
-    error.name = "BadRequest";
-    throw error;
+  if (user) {
+    return {
+      id: user.id,
+      email: user.email,
+    };
   }
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    productCategories: user.productCategory,
-  };
-}
-
-async function updateUserRole(
-  userId: string,
-  role: UserRole,
-  dbClient: PrismaClient
-) {
-  const user = await dbClient.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      role: role,
-    },
-  });
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  };
-}
-
-async function updateUserProductCategories(
-  userId: string,
-  categories: Array<string>,
-  dbClient: PrismaClient
-) {
-  const user = await dbClient.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      productCategory: categories,
-    },
-  });
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    productCategories: user.productCategory,
-  };
+  throw createError("BadRequest", "User not exist");
 }
 
 async function getAllUsers(dbClient: PrismaClient) {
@@ -66,8 +21,6 @@ async function getAllUsers(dbClient: PrismaClient) {
     select: {
       id: true,
       email: true,
-      role: true,
-      productCategory: true,
     },
   });
   return users;
@@ -81,8 +34,8 @@ async function deleteAllUsers(dbClient: PrismaClient) {
 async function deleteUserById(userId: string, dbClient: PrismaClient) {
   const user = await dbClient.user.delete({
     where: {
-      id: userId
-    }
+      id: userId,
+    },
   });
   if (user) {
     return user;
@@ -92,9 +45,7 @@ async function deleteUserById(userId: string, dbClient: PrismaClient) {
 
 export {
   getUserById,
-  updateUserRole,
   getAllUsers,
-  updateUserProductCategories,
   deleteAllUsers,
   deleteUserById,
 };

@@ -6,19 +6,11 @@ import {
   deleteUserById,
   getAllUsers,
   getUserById,
-  updateUserProductCategories,
-  updateUserRole,
 } from "@/services/UserService";
-import { UpdateRoleRequest } from "@/types/User";
 import {
   deleteCompanyByUserId,
-  deleteSavedCompanyByPicId,
   getCompanyByUserId,
 } from "@/services/CompanyService";
-import {
-  deletePersonInChargeByUserId,
-  getPersonInChargeByCompanyIdRaw,
-} from "@/services/PersonInChargeService";
 import { deleteProductByCompanyId } from "@/services/Product";
 
 const route = Router();
@@ -30,36 +22,6 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const user = await getUserById(req.user._id, dbClient);
       return res.json(user);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  route.post("/update-role", auth, async (req, res, next) => {
-    const request = req.body as UpdateRoleRequest;
-    try {
-      const userId = req.user?._id ?? 0;
-      const result = await updateUserRole(
-        userId.toString(),
-        request.role,
-        dbClient
-      );
-      return res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  route.post("/update-categories", auth, async (req, res, next) => {
-    const request = req.body.categories as Array<string>;
-    try {
-      const userId = req.user._id;
-      const result = await updateUserProductCategories(
-        userId,
-        request,
-        dbClient
-      );
-      return res.json(result);
     } catch (err) {
       next(err);
     }
@@ -77,22 +39,13 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/delete/:userId", auth, async (req, res, next) => {
     try {
       const userToDelete = await getUserById(req.params.userId, dbClient);
-      const companyToDelete = await getCompanyByUserId(userToDelete.id, dbClient);
+      const companyToDelete = await getCompanyByUserId(
+        userToDelete.id,
+        dbClient
+      );
       if (userToDelete) {
-        const picToDelete = await getPersonInChargeByCompanyIdRaw(
-          companyToDelete?.id,
-          dbClient
-        );
-        const savedCompanies = await deleteSavedCompanyByPicId(
-          picToDelete?.id,
-          dbClient
-        );
         const products = await deleteProductByCompanyId(
           companyToDelete?.id,
-          dbClient
-        );
-        const pic = await deletePersonInChargeByUserId(
-          userToDelete.id,
           dbClient
         );
         const company = await deleteCompanyByUserId(userToDelete.id, dbClient);
@@ -101,8 +54,6 @@ export default (app: Router, dbClient: PrismaClient) => {
           user,
           company,
           products,
-          savedCompanies,
-          pic,
         });
       }
       const error = new Error("User not found");

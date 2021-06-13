@@ -1,16 +1,17 @@
-import { Company, PrismaClient } from ".prisma/client";
+import { PrismaClient } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
 import { CreateProductRequest, ProductRequest } from "@/types/Product";
 import { injectKeyToArray, saveMultipleImages } from "@/utils/Utils";
-import { getAllCompaniesRaw } from "./CompanyService";
-import { updateUserProductCategories } from "./UserService";
 
 async function createProducts(
   products: CreateProductRequest,
   dbClient: PrismaClient,
   companyId: string
 ) {
+  const productCategories = products.products.map(
+    (product) => product.category
+  );
   const injectedProductWithCompanyId = injectKeyToArray(
     "companyId",
     companyId,
@@ -32,35 +33,25 @@ async function createProducts(
   const productsResult = await dbClient.product.createMany({
     data: productsWithImg,
   });
-  const userProducts = await dbClient.product.findMany({
-    where: {
-      companyId,
-    },
-    select: {
-      category: true,
-    },
-  });
-  const user = await dbClient.company.findUnique({
+  const company = await dbClient.company.findUnique({
     where: {
       id: companyId,
     },
-    select: {
-      userId: true,
-    },
   });
-  const userId = user?.userId ?? "";
-  const categories = userProducts.map((userProduct) => userProduct.category);
-  const filteredCategories: Array<string> = [];
-  categories.forEach((category) => {
-    if (
-      !filteredCategories.find(
-        (filteredCategory) => filteredCategory === category
-      )
-    ) {
-      filteredCategories.push(category);
-    }
-  });
-  await updateUserProductCategories(userId, categories, dbClient);
+  if (company) {
+    const mergedCategories = new Set([
+      ...company.productCategories,
+      ...productCategories,
+    ]);
+    await dbClient.company.update({
+      where: {
+        id: companyId,
+      },
+      data: {
+        productCategories: Array.from(mergedCategories),
+      },
+    });
+  }
   return productsResult;
 }
 
@@ -97,48 +88,6 @@ async function getProductsByCompanyId(
   return products;
 }
 
-async function getCompanyByProductCategory(
-  companyId: string,
-  category: Array<string>,
-  dbClient: PrismaClient
-) {
-  if (category.length > 0) {
-    const filters = category.map((category) => ({
-      category: category,
-    }));
-    const products = await dbClient.product.findMany({
-      where: {
-        OR: filters,
-      },
-      include: {
-        company: true,
-      },
-    });
-    const companies = products.map((product) => product.company);
-    const filteredCompanies: Company[] = [];
-    companies.forEach((company) => {
-      const isCompanyExist = filteredCompanies.find(
-        (companyRaw) => companyRaw.id === company.id
-      );
-      if (!isCompanyExist && company.id !== companyId) {
-        filteredCompanies.push(company);
-      }
-    });
-    if (filteredCompanies.length < 3) {
-      const result = await getAllCompaniesRaw(dbClient);
-      const filteredResult = result.filter(
-        (company) => company.id !== companyId
-      );
-      return filteredResult;
-    }
-    return filteredCompanies;
-  } else {
-    const result = await getAllCompaniesRaw(dbClient);
-    const filteredResult = result.filter((company) => company.id !== companyId);
-    return filteredResult;
-  }
-}
-
 async function getAllProducts(dbClient: PrismaClient) {
   const products = await dbClient.product.findMany({
     select: {
@@ -151,22 +100,6 @@ async function getAllProducts(dbClient: PrismaClient) {
     },
   });
   return products;
-}
-
-async function getProductCategoriesByCompanyId(
-  companyId: string,
-  dbClient: PrismaClient
-) {
-  const products = await dbClient.product.findMany({
-    where: {
-      companyId,
-    },
-    select: {
-      category: true,
-    },
-  });
-  const productCategories = products.map((product) => product.category);
-  return productCategories;
 }
 
 async function deleteAllProducts(dbClient: PrismaClient) {
@@ -202,8 +135,6 @@ export {
   createProducts,
   getProductsByCompanyId,
   getAllProducts,
-  getCompanyByProductCategory,
-  getProductCategoriesByCompanyId,
   updateProduct,
   deleteAllProducts,
   deleteProductById,
