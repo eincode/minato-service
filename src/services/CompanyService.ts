@@ -39,8 +39,19 @@ async function createCompany(
         : undefined,
     },
     include: {
-      requestAsBuyer: true,
-      requestAsSeller: true,
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
       product: true,
     },
   });
@@ -103,8 +114,19 @@ async function updateCompany(
     },
     include: {
       product: true,
-      requestAsSeller: true,
-      requestAsBuyer: true,
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
     },
   });
   return editedCompany;
@@ -117,8 +139,19 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
     },
     include: {
       product: true,
-      requestAsBuyer: true,
-      requestAsSeller: true,
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
     },
   });
   if (company) {
@@ -134,8 +167,19 @@ async function getCompanyById(companyId: string, dbClient: PrismaClient) {
     },
     include: {
       product: true,
-      requestAsSeller: true,
-      requestAsBuyer: true,
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
     },
   });
   if (!company) {
@@ -177,8 +221,19 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
       savedCompanies: {
         include: {
           product: true,
-          requestAsBuyer: true,
-          requestAsSeller: true,
+          requestAsBuyer: {
+            select: {
+              destinationPort: true,
+              other: true,
+              paymentMethod: true,
+              productName: true,
+            },
+          },
+          requestAsSeller: {
+            select: {
+              request: true,
+            },
+          },
         },
       },
     },
@@ -205,8 +260,19 @@ async function getBuyerCompaniesByCategories(
       },
     },
     include: {
-      requestAsBuyer: true,
-      requestAsSeller: true,
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
       product: true,
     },
   });
@@ -224,8 +290,19 @@ async function getSellerCompaniesByCategories(
       },
     },
     include: {
-      requestAsBuyer: true,
-      requestAsSeller: true,
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
       product: true,
     },
   });
