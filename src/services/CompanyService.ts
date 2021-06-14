@@ -160,13 +160,18 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
   throw createError("BadRequest", "Company doesn't exist");
 }
 
-async function getCompanyById(companyId: string, dbClient: PrismaClient) {
+async function getCompanyById(
+  companyId: string,
+  dbClient: PrismaClient,
+  includeUser = false
+) {
   const company = await dbClient.company.findUnique({
     where: {
       id: companyId,
     },
     include: {
       product: true,
+      user: includeUser,
       requestAsSeller: {
         select: {
           request: true,

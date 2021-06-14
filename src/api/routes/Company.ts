@@ -44,8 +44,9 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/", auth, async (req, res, next) => {
     const id = req.query.id as string;
+    const includeUser = req.query.includeUser as string;
     try {
-      const result = await getCompanyById(id, dbClient);
+      const result = await getCompanyById(id, dbClient, !!includeUser);
       return res.json(result);
     } catch (err) {
       next(err);
