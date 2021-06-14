@@ -40,9 +40,9 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/delete-all-data", async (_, res, next) => {
     try {
-      await deleteAllCompanies(dbClient);
-      await deleteAllPics(dbClient);
       await deleteAllProducts(dbClient);
+      await deleteAllPics(dbClient);
+      await deleteAllCompanies(dbClient);
       await deleteAllUsers(dbClient);
       res.json({ success: true });
     } catch (err) {

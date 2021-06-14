@@ -3,6 +3,8 @@ import { v4 as uuid } from "uuid";
 
 import { CreateCompanyRequest } from "@/types/Company";
 import { createError, saveImage } from "@/utils/Utils";
+import { deleteProductByCompanyId } from "./Product";
+import { deletePersonInChargeByCompanyId } from "./PersonInChargeService";
 
 async function createCompany(
   company: CreateCompanyRequest,
@@ -321,35 +323,31 @@ async function deleteAllCompanies(dbClient: PrismaClient) {
   return companies;
 }
 
-async function deleteCompanyByUserId(
-  userId: string | undefined,
-  dbClient: PrismaClient
-) {
-  if (userId) {
-    const companyToDelete = await dbClient.company.findFirst({
+async function deleteCompanyByUserId(userId: string, dbClient: PrismaClient) {
+  const companyToDelete = await dbClient.company.findFirst({
+    where: {
+      userId,
+    },
+  });
+  if (companyToDelete) {
+    await deleteProductByCompanyId(companyToDelete.id, dbClient);
+    await deletePersonInChargeByCompanyId(companyToDelete.id, dbClient);
+    await dbClient.sellerRequest.deleteMany({
       where: {
-        userId,
+        companyId: companyToDelete.id,
       },
     });
-    if (companyToDelete) {
-      await dbClient.sellerRequest.deleteMany({
-        where: {
-          companyId: companyToDelete.id,
-        },
-      });
-      await dbClient.buyerRequest.deleteMany({
-        where: {
-          companyId: companyToDelete.id,
-        },
-      });
-      const company = await dbClient.company.delete({
-        where: {
-          id: companyToDelete?.id,
-        },
-      });
-      return company;
-    }
-    return null;
+    await dbClient.buyerRequest.deleteMany({
+      where: {
+        companyId: companyToDelete.id,
+      },
+    });
+    const company = await dbClient.company.delete({
+      where: {
+        id: companyToDelete?.id,
+      },
+    });
+    return company;
   }
   return null;
 }

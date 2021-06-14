@@ -7,12 +7,6 @@ import {
   getAllUsers,
   getUserById,
 } from "@/services/UserService";
-import {
-  deleteCompanyByUserId,
-  getCompanyByUserId,
-} from "@/services/CompanyService";
-import { deleteProductByCompanyId } from "@/services/Product";
-import { deletePersonInChargeById, getPersonInChargeByCompanyId } from "@/services/PersonInChargeService";
 
 const route = Router();
 
@@ -40,28 +34,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/delete/:userId", auth, async (req, res, next) => {
     try {
       const userToDelete = await getUserById(req.params.userId, dbClient);
-      const companyToDelete = await getCompanyByUserId(
-        userToDelete.id,
-        dbClient
-      );
-      const picToDelete = await getPersonInChargeByCompanyId(
-        companyToDelete.id,
-        dbClient
-      );
       if (userToDelete) {
-        const products = await deleteProductByCompanyId(
-          companyToDelete?.id,
-          dbClient
-        );
-        const pic = await deletePersonInChargeById(picToDelete?.id, dbClient)
-        const company = await deleteCompanyByUserId(userToDelete.id, dbClient);
         const user = await deleteUserById(userToDelete.id, dbClient);
-        return res.json({
-          user,
-          pic,
-          company,
-          products,
-        });
+        return res.json(user);
       }
       const error = new Error("User not found");
       error.name = "BadRequest";

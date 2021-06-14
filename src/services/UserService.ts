@@ -1,5 +1,6 @@
 import { createError } from "@/utils/Utils";
 import { PrismaClient } from "@prisma/client";
+import { deleteCompanyByUserId } from "./CompanyService";
 
 async function getUserById(id: string, dbClient: PrismaClient) {
   const user = await dbClient.user.findUnique({
@@ -32,6 +33,7 @@ async function deleteAllUsers(dbClient: PrismaClient) {
 }
 
 async function deleteUserById(userId: string, dbClient: PrismaClient) {
+  await deleteCompanyByUserId(userId, dbClient);
   const user = await dbClient.user.delete({
     where: {
       id: userId,
