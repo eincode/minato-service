@@ -18,4 +18,17 @@ async function track(userId: string, dbClient: PrismaClient, endpoint: string) {
   return result;
 }
 
-export { track };
+async function getAllTracks(dbClient: PrismaClient) {
+  const result = await dbClient.tracker.findMany({
+    include: {
+      user: {
+        select: {
+          email: true,
+        },
+      },
+    },
+  });
+  return result;
+}
+
+export { track, getAllTracks };
