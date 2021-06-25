@@ -10,6 +10,9 @@ async function createPersonInCharge(
   companyId: string
 ) {
   const id = uuid();
+  console.log(
+    `Requesting createPersonInCharge with request ${JSON.stringify(pic)}`
+  );
   const img = pic.img ? saveImage(pic.img, "PersonInCharge", id) : null;
   const result = await dbClient.personInCharge.create({
     data: {

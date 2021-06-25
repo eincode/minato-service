@@ -6,11 +6,13 @@ import { auth } from "../middlewares/Auth";
 import {
   createCompany,
   getAllCompanies,
-  getBuyerCompaniesByCategories,
+  getBuyerCompanies,
+  // getBuyerCompaniesByCategories,
   getCompanyById,
   getCompanyByUserId,
   getSavedCompany,
-  getSellerCompaniesByCategories,
+  getSellerCompanies,
+  // getSellerCompaniesByCategories,
   saveCompany,
   updateCompany,
 } from "@/services/CompanyService";
@@ -93,10 +95,12 @@ export default (app: Router, dbClient: PrismaClient) => {
       if (categories.length === 0) {
         throw createError("BadRequest", "You have not setup seller account");
       }
-      const companies = await getBuyerCompaniesByCategories(
-        categories,
-        dbClient
-      );
+      // Temporary, reuse after data is populated
+      // const companies = await getBuyerCompaniesByCategories(
+      //   categories,
+      //   dbClient
+      // );
+      const companies = await getBuyerCompanies(dbClient);
       const result = companies.filter(
         (company) => company.id !== userCompany.id
       );
@@ -114,10 +118,12 @@ export default (app: Router, dbClient: PrismaClient) => {
       if (categories.length === 0) {
         throw createError("BadRequest", "You have not setup buyer account");
       }
-      const companies = await getSellerCompaniesByCategories(
-        categories,
-        dbClient
-      );
+      // Temporary, reuse after data is populated
+      // const companies = await getSellerCompaniesByCategories(
+      //   categories,
+      //   dbClient
+      // );
+      const companies = await getSellerCompanies(dbClient);
       const result = companies.filter(
         (company) => company.id !== userCompany.id
       );

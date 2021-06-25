@@ -9,6 +9,11 @@ async function createProducts(
   dbClient: PrismaClient,
   companyId: string
 ) {
+  console.log(
+    `Requesting createProducts with request ${JSON.stringify(
+      products
+    )} and company id ${companyId}`
+  );
   const productCategories = products.products.map(
     (product) => product.category
   );

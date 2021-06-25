@@ -12,6 +12,9 @@ async function createCompany(
   userId: string
 ) {
   const id = uuid();
+  console.log(
+    `Requesting createCompany with request ${JSON.stringify(company)}`
+  );
   const img = company.img ? saveImage(company.img, "Company", id) : null;
   const result = await dbClient.company.create({
     data: {
@@ -316,6 +319,60 @@ async function getSellerCompaniesByCategories(
   return companies;
 }
 
+async function getSellerCompanies(dbClient: PrismaClient) {
+  const companies = await dbClient.company.findMany({
+    where: {
+      productCategories: {
+        isEmpty: false,
+      },
+    },
+    include: {
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
+      product: true,
+    },
+  });
+  return companies;
+}
+
+async function getBuyerCompanies(dbClient: PrismaClient) {
+  const companies = await dbClient.company.findMany({
+    where: {
+      buyingCategories: {
+        isEmpty: false,
+      },
+    },
+    include: {
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
+      product: true,
+    },
+  });
+  return companies;
+}
+
 async function deleteAllCompanies(dbClient: PrismaClient) {
   await dbClient.sellerRequest.deleteMany();
   await dbClient.buyerRequest.deleteMany();
@@ -387,4 +444,6 @@ export {
   deleteAllCompanies,
   deleteCompanyByUserId,
   deleteCompanyById,
+  getSellerCompanies,
+  getBuyerCompanies,
 };
