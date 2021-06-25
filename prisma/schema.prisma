@@ -17,6 +17,7 @@ model User {
   password       String
   savedCompanies Company[] @relation("savedCompanies")
   company        Company?
+  tracker        Tracker[]
 }
 
 model BuyerRequest {
@@ -78,4 +79,12 @@ model Product {
   img                  String[]
   isHalal              Boolean
   minimumOrderQuantity String
+}
+
+model Tracker {
+  id       String   @id
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  time     DateTime
+  endpoint String
 }

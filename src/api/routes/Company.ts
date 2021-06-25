@@ -17,6 +17,7 @@ import {
   updateCompany,
 } from "@/services/CompanyService";
 import { createError } from "@/utils/Utils";
+import { track } from "@/services/TrackerService";
 
 const route = Router();
 
@@ -95,6 +96,7 @@ export default (app: Router, dbClient: PrismaClient) => {
       if (categories.length === 0) {
         throw createError("BadRequest", "You have not setup seller account");
       }
+      track(userId, dbClient, '/home/seller');
       // Temporary, reuse after data is populated
       // const companies = await getBuyerCompaniesByCategories(
       //   categories,
@@ -123,6 +125,7 @@ export default (app: Router, dbClient: PrismaClient) => {
       //   categories,
       //   dbClient
       // );
+      track(userId, dbClient, "/home/buyer");
       const companies = await getSellerCompanies(dbClient);
       const result = companies.filter(
         (company) => company.id !== userCompany.id
