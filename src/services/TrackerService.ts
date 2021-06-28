@@ -27,6 +27,9 @@ async function getAllTracks(dbClient: PrismaClient) {
         },
       },
     },
+    orderBy: {
+      time: "desc",
+    },
   });
   return result;
 }
