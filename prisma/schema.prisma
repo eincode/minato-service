@@ -17,7 +17,6 @@ model User {
   password       String
   savedCompanies Company[] @relation("savedCompanies")
   company        Company?
-  tracker        Tracker[]
 }
 
 model BuyerRequest {
@@ -83,8 +82,7 @@ model Product {
 
 model Tracker {
   id       String   @id
-  userId   String
-  user     User     @relation(fields: [userId], references: [id])
+  email    String
   time     DateTime
   endpoint String
 }
