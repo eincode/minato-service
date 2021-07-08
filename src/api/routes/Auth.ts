@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 
 import { LoginRequest, RegisterRequest } from "@/types/User";
-import { login, signUp } from "@/services/AuthService";
+import { adminLogin, login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
 import { deleteAllCompanies } from "@/services/CompanyService";
 import { deleteAllPics } from "@/services/PersonInChargeService";
@@ -28,6 +28,16 @@ export default (app: Router, dbClient: PrismaClient) => {
     const user = req.body as LoginRequest;
     try {
       const result = await login(user, dbClient);
+      res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.post("/admin-login", async (req, res, next) => {
+    const user = req.body as LoginRequest;
+    try {
+      const result = await adminLogin(user);
       res.status(200).json(result);
     } catch (err) {
       next(err);

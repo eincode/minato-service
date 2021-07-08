@@ -23,6 +23,16 @@ function generateToken(user: User) {
   );
 }
 
+function generateAdminToken() {
+  return jwt.sign(
+    {
+      _id: "admin",
+      email: "admin@admin.com",
+    },
+    config.jwtSecret
+  );
+}
+
 async function comparePassword(candidatePassword: string, password: string) {
   const isMatch = await bcrypt.compare(candidatePassword, password);
   return isMatch;
@@ -88,4 +98,13 @@ async function login(req: LoginRequest, dbClient: PrismaClient) {
   }
 }
 
-export { signUp, login };
+async function adminLogin(req: LoginRequest) {
+  if (req.email === "admin@admin.com" && req.password === "akuPadamu") {
+    const token = generateAdminToken();
+    return { accessToken: token };
+  } else {
+    throw createError("BadRequest", "Wrong credentials");
+  }
+}
+
+export { signUp, login, adminLogin };
