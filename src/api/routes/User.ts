@@ -7,6 +7,7 @@ import {
   getAllUsers,
   getUserById,
 } from "@/services/UserService";
+import { createError } from "@/utils/Utils";
 
 const route = Router();
 
@@ -38,9 +39,7 @@ export default (app: Router, dbClient: PrismaClient) => {
         const user = await deleteUserById(userToDelete.id, dbClient);
         return res.json(user);
       }
-      const error = new Error("User not found");
-      error.name = "BadRequest";
-      throw error;
+      throw createError("BadRequest", "User not found");
     } catch (err) {
       next(err);
     }

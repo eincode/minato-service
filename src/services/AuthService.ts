@@ -84,7 +84,7 @@ async function login(req: LoginRequest, dbClient: PrismaClient) {
     },
   });
   if (!user) {
-    throw new Error("User not exist!");
+    throw createError("BadRequest", "User doesn't exists!");
   }
 
   const isPasswordMatched = await comparePassword(req.password, user.password);
@@ -92,9 +92,7 @@ async function login(req: LoginRequest, dbClient: PrismaClient) {
     const token = generateToken(user);
     return { accessToken: token };
   } else {
-    const error = new Error("Wrong password");
-    error.name = "BadRequest";
-    throw error;
+    throw createError("BadRequest", "Wrong username and password combination!");
   }
 }
 
