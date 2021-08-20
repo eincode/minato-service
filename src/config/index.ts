@@ -15,4 +15,5 @@ export default {
   jwtSecret: process.env.JWT_SECRET || "",
   jwtAlgorithm: process.env.JWT_ALGO || "",
   saltFactor: process.env.SALT_WORK_FACTOR || "0",
+  nodeEnv: process.env.NODE_ENV || "development",
 };
