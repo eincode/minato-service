@@ -2138,6 +2138,11 @@ rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
+runtypes@^6.3.2:
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/runtypes/-/runtypes-6.3.2.tgz#e10e3e8072f015d96caadca3101b9722e4085fec"
+  integrity sha512-wQMHj5F4yxVIgCTtV+2QaDfeyCUiesHzgkBpUUhL1dZph2ekOcZcttJvk3pTdw/qBhbEdXvXKDHRm6wfoNke0w==
+
 safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"

@@ -1,29 +1,38 @@
-type RegisterRequest = {
-  email: string;
-  password: string;
-  confirmationPassword: string;
-};
+import * as t from "runtypes";
 
-type LoginRequest = {
-  email: string;
-  password: string;
-};
+const RegisterRequestSchema = t.Record({
+  email: t.String,
+  password: t.String,
+  confirmationPassword: t.String,
+});
 
-type User = {
-  id: number;
-  email: string;
-};
+export type RegisterRequest = t.Static<typeof RegisterRequestSchema>;
 
-type UserRole = "UNSPECIFIED" | "SELLER" | "BUYER";
+const RegisterResponseSchema = t.Record({
+  email: t.String,
+  accessToken: t.String,
+});
 
-type UpdateRoleRequest = {
-  role: UserRole;
-};
+export type RegisterResponse = t.Static<typeof RegisterResponseSchema>;
 
-export type {
-  RegisterRequest,
-  LoginRequest,
-  User,
-  UserRole,
-  UpdateRoleRequest,
-};
+const LoginRequestSchema = t.Record({
+  email: t.String,
+  password: t.String
+});
+
+export type LoginRequest = t.Static<typeof LoginRequestSchema>;
+
+const LoginResponseSchema = t.Record({
+  accessToken: t.String
+});
+
+export type LoginResponse = t.Static<typeof LoginResponseSchema>;
+
+const UserSchema = t.Record({
+  id: t.String,
+  email: t.String
+});
+
+export type User = t.Static<typeof UserSchema>;
+
+export { RegisterRequestSchema, RegisterResponseSchema, LoginRequestSchema, LoginResponseSchema, UserSchema };

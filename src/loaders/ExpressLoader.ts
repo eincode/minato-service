@@ -5,6 +5,7 @@ import cors from "cors";
 
 import config from "@/config";
 import routes from "@/api";
+import { ValidationError } from "runtypes";
 
 async function loadExpress(app: Express, dbClient: PrismaClient) {
   app.get("/status", (_, res) => {
@@ -46,6 +47,9 @@ async function loadExpress(app: Express, dbClient: PrismaClient) {
   app.use("/static", express.static("public"));
   app.use(config.api.prefix, routes(dbClient));
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    if (err instanceof ValidationError) {
+      return res.status(400).json({ message: err.message });
+    }
     if (err.name === "UnauthorizedError") {
       return res.status(401).json({ message: err.message });
     }

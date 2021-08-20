@@ -1,7 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 
-import { LoginRequest, RegisterRequest } from "@/types/User";
+import {
+  LoginRequestSchema,
+  LoginResponse,
+  RegisterRequestSchema,
+  RegisterResponse,
+} from "@/types/User";
 import { adminLogin, login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
 import { deleteAllCompanies } from "@/services/CompanyService";
@@ -15,9 +20,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   app.use("/auth", route);
 
   route.post("/register", async (req, res, next) => {
-    const user = req.body as RegisterRequest;
     try {
-      const result = await signUp(user, dbClient);
+      const user = RegisterRequestSchema.check(req.body);
+      const result: RegisterResponse = await signUp(user, dbClient);
       res.status(200).json(result);
     } catch (err) {
       next(err);
@@ -25,9 +30,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.post("/login", async (req, res, next) => {
-    const user = req.body as LoginRequest;
     try {
-      const result = await login(user, dbClient);
+      const user = LoginRequestSchema.check(req.body);
+      const result: LoginResponse = await login(user, dbClient);
       res.status(200).json(result);
     } catch (err) {
       next(err);
@@ -35,9 +40,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.post("/admin-login", async (req, res, next) => {
-    const user = req.body as LoginRequest;
     try {
-      const result = await adminLogin(user);
+      const user = LoginRequestSchema.check(req.body);
+      const result: LoginResponse = await adminLogin(user);
       res.status(200).json(result);
     } catch (err) {
       next(err);
