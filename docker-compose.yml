@@ -2,5 +2,7 @@ version: "3.9"
 services:
   minato-service:
     build: .
+    environment:
+      NODE_ENV: "production"
     ports:
       - "80:3000"
