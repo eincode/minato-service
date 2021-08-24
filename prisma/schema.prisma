@@ -86,3 +86,18 @@ model Tracker {
   time     DateTime
   endpoint String
 }
+
+model IndustryCategory {
+  id                  String                @id
+  en                  String
+  jp                  String
+  IndustrySubCategory IndustrySubCategory[]
+}
+
+model IndustrySubCategory {
+  id               String           @id
+  en               String
+  jp               String
+  parent           IndustryCategory @relation(fields: [parentCategoryId], references: [id])
+  parentCategoryId String
+}
