@@ -54,4 +54,25 @@ async function deleteSubCategory(categoryId: string, dbClient: PrismaClient) {
   return result;
 }
 
-export { addCategory, addSubCategory, deleteCategory, deleteSubCategory };
+async function getAllCategories(dbClient: PrismaClient) {
+  const result = await dbClient.industryCategory.findMany({
+    include: {
+      subCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+    },
+  });
+  return result;
+}
+
+export {
+  addCategory,
+  addSubCategory,
+  deleteCategory,
+  deleteSubCategory,
+  getAllCategories,
+};

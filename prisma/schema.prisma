@@ -88,10 +88,10 @@ model Tracker {
 }
 
 model IndustryCategory {
-  id                  String                @id
-  en                  String
-  jp                  String
-  IndustrySubCategory IndustrySubCategory[]
+  id            String                @id
+  en            String
+  jp            String
+  subCategories IndustrySubCategory[]
 }
 
 model IndustrySubCategory {
