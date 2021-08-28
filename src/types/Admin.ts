@@ -1,8 +1,8 @@
 import * as t from "runtypes";
 
 const AddCategoryRequestSchema = t.Record({
-  en: t.String,
-  jp: t.String,
+  en: t.String.withConstraint((en) => en.length > 0),
+  jp: t.String.withConstraint((jp) => jp.length > 0),
 });
 
 export type AddCategoryRequest = t.Static<typeof AddCategoryRequestSchema>;
@@ -17,8 +17,8 @@ export type AddCategoryResponse = t.Static<typeof AddCategoryResponseSchema>;
 
 const AddSubCategoryRequestSchema = t.Record({
   parentCategoryId: t.String,
-  en: t.String,
-  jp: t.String,
+  en: t.String.withConstraint((en) => en.length > 0),
+  jp: t.String.withConstraint((jp) => jp.length > 0),
 });
 
 export type AddSubCategoryRequest = t.Static<
