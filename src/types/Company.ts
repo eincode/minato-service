@@ -1,59 +1,113 @@
-import { CreatePersonInChargeRequest, PersonInCharge } from "./PersonInCharge";
-import { CreateProductRequest, Product } from "./Product";
-import { User } from "./User";
+import * as t from "runtypes";
+import { CategorySchema } from "./Category";
 
-type CreateCompanyRequest = {
-  country: string;
-  name: string;
-  typeOfIndustry: string;
-  address: string;
-  website: string;
-  email: string;
-  phoneNumber: string;
-  img?: string;
-  productCategories: Array<string>;
-  requestAsBuyer: {
-    productName: string;
-    destinationPort: string;
-    paymentMethod: string;
-    other: string;
-  };
-  requestAsSeller: {
-    request: string;
-  };
-};
+const BuyerRequestSchema = t.Record({
+  productName: t.String,
+  destinationPort: t.String,
+  paymentMethod: t.String,
+  other: t.String,
+});
 
-type CompleteProfileRequest = {
-  company: CreateCompanyRequest;
-  personInCharge: CreatePersonInChargeRequest;
-  products: CreateProductRequest;
-};
+export type BuyerRequest = t.Static<typeof BuyerRequestSchema>;
 
-type SaveCompanyRequest = {
-  companyId: string;
-};
+const SellerRequestSchema = t.Record({
+  request: t.String,
+});
 
-type Company = CreateCompanyRequest & {
-  id: number;
-  user: User;
-  userId: number;
-  createdAt: string;
-  personInCharge: PersonInCharge;
-  products: Array<Product>;
-  savedCompany: Array<SavedCompany>;
-};
+export type SellerRequest = t.Static<typeof SellerRequestSchema>;
 
-type SavedCompany = {
-  id: number;
-  personInCharge: PersonInCharge;
-  personInChargeId: number;
-  companies: Array<Company>;
-};
+const CompanySchema = t.Record({
+  id: t.String,
+  userId: t.String,
+  country: t.String,
+  name: t.String,
+  typeOfIndustry: CategorySchema,
+  address: t.String,
+  website: t.String,
+  email: t.String,
+  phoneNumber: t.String,
+  img: t.String.optional(),
+  productCategories: t.Array(CategorySchema),
+  buyingCategories: t.Array(CategorySchema),
+  requestAsBuyer: BuyerRequestSchema.optional(),
+  requestAsSeller: SellerRequestSchema.optional(),
+});
 
-export type {
-  Company,
-  CompleteProfileRequest,
-  CreateCompanyRequest,
-  SaveCompanyRequest,
-  SavedCompany,
+export type Company = t.Static<typeof CompanySchema>;
+
+const CreateCompanyRequestSchema = t.Record({
+  country: t.String,
+  name: t.String,
+  typeOfIndustry: t.String,
+  address: t.String,
+  website: t.String,
+  email: t.String,
+  phoneNumber: t.String,
+  img: t.String.optional(),
+  buyingCategories: t.Array(t.String).optional(),
+  requestAsBuyer: BuyerRequestSchema.optional(),
+  requestAsSeller: SellerRequestSchema.optional(),
+});
+
+export type CreateCompanyRequest = t.Static<typeof CreateCompanyRequestSchema>;
+
+const CreateCompanyResponseSchema = CompanySchema;
+
+export type CreateCompanyResponse = t.Static<
+  typeof CreateCompanyResponseSchema
+>;
+
+const UpdateCompanyRequestSchema = CreateCompanyRequestSchema;
+
+export type UpdateCompanyRequestSchema = t.Static<
+  typeof UpdateCompanyRequestSchema
+>;
+
+const UpdateCompanyResponseSchema = CompanySchema;
+
+export type UpdateCompanyResponse = t.Static<
+  typeof UpdateCompanyResponseSchema
+>;
+
+const GetMyCompanyResponseSchema = CompanySchema;
+
+export type GetMyCompanyResponse = t.Static<typeof GetMyCompanyResponseSchema>;
+
+const GetCompanyByIdResponseSchema = CompanySchema;
+
+export type GetCompanyByIdResponseSchmea = t.Static<
+  typeof GetCompanyByIdResponseSchema
+>;
+
+const SaveCompanyRequestSchema = t.Record({
+  companyId: t.String,
+});
+
+export type SaveCompanyRequest = t.Static<typeof SaveCompanyRequestSchema>;
+
+const SaveCompanyResponseSchema = t.Record({
+  message: t.String
+});
+
+export type SaveCompanyResponse = t.Static<typeof SaveCompanyResponseSchema>;
+
+const GetSavedCompaniesResponseSchema = t.Array(CompanySchema);
+
+export type GetSavedCompaniesResponseSchema = t.Static<
+  typeof GetSavedCompaniesResponseSchema
+>;
+
+export {
+  BuyerRequestSchema,
+  SellerRequestSchema,
+  CompanySchema,
+  CreateCompanyRequestSchema,
+  CreateCompanyResponseSchema,
+  UpdateCompanyRequestSchema,
+  UpdateCompanyResponseSchema,
+  SaveCompanyRequestSchema,
+  SaveCompanyResponseSchema,
+  GetSavedCompaniesResponseSchema,
+  GetMyCompanyResponseSchema,
+  GetCompanyByIdResponseSchema,
 };
