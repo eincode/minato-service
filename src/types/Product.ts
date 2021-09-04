@@ -53,7 +53,7 @@ export type UpdateProductResponse = t.Static<
 
 const GetMyProductsResponseSchema = t.Array(ProductSchema);
 
-export type GetMyProductsResponseSchema = t.Static<
+export type GetMyProductsResponse = t.Static<
   typeof GetMyProductsResponseSchema
 >;
 
@@ -61,6 +61,18 @@ const GetProductsByCompanyIdResponseSchema = t.Array(ProductSchema);
 
 export type GetProductsByCompanyIdResponse = t.Static<
   typeof GetProductsByCompanyIdResponseSchema
+>;
+
+const GetAllProductsResponseSchema = t.Array(ProductSchema);
+
+export type GetAllProductsResponse = t.Static<
+  typeof GetAllProductsResponseSchema
+>;
+
+const DeleteProductByIdResponseSchema = ProductSchema;
+
+export type DeleteProductByIdResponse = t.Static<
+  typeof DeleteProductByIdResponseSchema
 >;
 
 export {
@@ -72,4 +84,6 @@ export {
   UpdateProductResponseSchema,
   GetMyProductsResponseSchema,
   GetProductsByCompanyIdResponseSchema,
+  GetAllProductsResponseSchema,
+  DeleteProductByIdResponseSchema,
 };

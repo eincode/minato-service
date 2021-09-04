@@ -26,11 +26,11 @@ const CompanySchema = t.Record({
   website: t.String,
   email: t.String,
   phoneNumber: t.String,
-  img: t.String.optional(),
+  img: t.String.Or(t.Null),
   productCategories: t.Array(CategorySchema),
   buyingCategories: t.Array(CategorySchema),
-  requestAsBuyer: BuyerRequestSchema.optional(),
-  requestAsSeller: SellerRequestSchema.optional(),
+  requestAsBuyer: BuyerRequestSchema.Or(t.Null),
+  requestAsSeller: SellerRequestSchema.Or(t.Null),
 });
 
 export type Company = t.Static<typeof CompanySchema>;
@@ -59,9 +59,7 @@ export type CreateCompanyResponse = t.Static<
 
 const UpdateCompanyRequestSchema = CreateCompanyRequestSchema;
 
-export type UpdateCompanyRequestSchema = t.Static<
-  typeof UpdateCompanyRequestSchema
->;
+export type UpdateCompanyRequest = t.Static<typeof UpdateCompanyRequestSchema>;
 
 const UpdateCompanyResponseSchema = CompanySchema;
 
@@ -75,7 +73,7 @@ export type GetMyCompanyResponse = t.Static<typeof GetMyCompanyResponseSchema>;
 
 const GetCompanyByIdResponseSchema = CompanySchema;
 
-export type GetCompanyByIdResponseSchmea = t.Static<
+export type GetCompanyByIdResponse = t.Static<
   typeof GetCompanyByIdResponseSchema
 >;
 
@@ -86,15 +84,33 @@ const SaveCompanyRequestSchema = t.Record({
 export type SaveCompanyRequest = t.Static<typeof SaveCompanyRequestSchema>;
 
 const SaveCompanyResponseSchema = t.Record({
-  message: t.String
+  message: t.String,
 });
 
 export type SaveCompanyResponse = t.Static<typeof SaveCompanyResponseSchema>;
 
 const GetSavedCompaniesResponseSchema = t.Array(CompanySchema);
 
-export type GetSavedCompaniesResponseSchema = t.Static<
+export type GetSavedCompaniesResponse = t.Static<
   typeof GetSavedCompaniesResponseSchema
+>;
+
+const GetAllCompaniesResponseSchema = t.Array(CompanySchema);
+
+export type GetAllCompaniesResponse = t.Static<
+  typeof GetAllCompaniesResponseSchema
+>;
+
+const GetBuyerCompaniesResponseSchema = t.Array(CompanySchema);
+
+export type GetBuyerCompaniesResponse = t.Static<
+  typeof GetBuyerCompaniesResponseSchema
+>;
+
+const GetSellerCompaniesResponseSchema = t.Array(CompanySchema);
+
+export type GetSellerCompaniesResponse = t.Static<
+  typeof GetSellerCompaniesResponseSchema
 >;
 
 export {
@@ -110,4 +126,7 @@ export {
   GetSavedCompaniesResponseSchema,
   GetMyCompanyResponseSchema,
   GetCompanyByIdResponseSchema,
+  GetAllCompaniesResponseSchema,
+  GetBuyerCompaniesResponseSchema,
+  GetSellerCompaniesResponseSchema,
 };

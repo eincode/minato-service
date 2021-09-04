@@ -69,10 +69,23 @@ async function getAllCategories(dbClient: PrismaClient) {
   return result;
 }
 
+async function getSubCategoriesByCategoryId(
+  categoryId: string,
+  dbClient: PrismaClient
+) {
+  const result = await dbClient.industrySubCategory.findMany({
+    where: {
+      parentCategoryId: categoryId,
+    },
+  });
+  return result;
+}
+
 export {
   addCategory,
   addSubCategory,
   deleteCategory,
   deleteSubCategory,
   getAllCategories,
+  getSubCategoriesByCategoryId,
 };

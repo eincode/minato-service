@@ -63,11 +63,12 @@ async function getAllPersonsInCharge(dbClient: PrismaClient) {
   const result = await dbClient.personInCharge.findMany({
     select: {
       id: true,
-      name: true,
-      email: true,
-      nationality: true,
-      phoneNumber: true,
       companyId: true,
+      name: true,
+      nationality: true,
+      email: true,
+      phoneNumber: true,
+      img: true,
     },
   });
   return result;

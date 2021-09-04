@@ -7,7 +7,7 @@ import {
   RegisterRequestSchema,
   RegisterResponse,
 } from "@/types/User";
-import { adminLogin, login, signUp } from "@/services/AuthService";
+import { login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
 import { deleteAllCompanies } from "@/services/CompanyService";
 import { deleteAllPics } from "@/services/PersonInChargeService";
@@ -33,16 +33,6 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const user = LoginRequestSchema.check(req.body);
       const result: LoginResponse = await login(user, dbClient);
-      res.status(200).json(result);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  route.post("/admin-login", async (req, res, next) => {
-    try {
-      const user = LoginRequestSchema.check(req.body);
-      const result: LoginResponse = await adminLogin(user);
       res.status(200).json(result);
     } catch (err) {
       next(err);

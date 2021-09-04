@@ -7,7 +7,7 @@ const PersonInChargeSchema = t.Record({
   nationality: t.String,
   email: t.String,
   phoneNumber: t.String,
-  img: t.String.optional(),
+  img: t.String.Or(t.Null),
 });
 
 export type PersonInCharge = t.Static<typeof PersonInChargeSchema>;
@@ -26,7 +26,7 @@ export type CreatePersonInChargeRequest = t.Static<
 
 const CreatePersonInChargeResponseSchema = PersonInChargeSchema;
 
-export type CreatePersonInCharegeResponse = t.Static<
+export type CreatePersonInChargeResponse = t.Static<
   typeof CreatePersonInChargeResponseSchema
 >;
 
@@ -42,16 +42,24 @@ export type UpdatePersonInChargeResponse = t.Static<
   typeof UpdatePersonInChargeResponseSchema
 >;
 
-const GetMyPersonInChargeResponseSchema = PersonInChargeSchema;
+const GetMyPersonInChargeResponseSchema = PersonInChargeSchema.Or(t.Null);
 
 export type GetMyPersonInChargeResponse = t.Static<
   typeof GetMyPersonInChargeResponseSchema
 >;
 
-const GetPersonInChargeByCompanyIdResponseSchema = PersonInChargeSchema;
+const GetPersonInChargeByCompanyIdResponseSchema = PersonInChargeSchema.Or(
+  t.Null
+);
 
 export type GetPersonInChargeByCompanyIdResponse = t.Static<
   typeof GetPersonInChargeByCompanyIdResponseSchema
+>;
+
+const GetAllPersonInChargeResponseSchema = t.Array(PersonInChargeSchema);
+
+export type GetAllPersonInChargeResponse = t.Static<
+  typeof GetAllPersonInChargeResponseSchema
 >;
 
 export {
@@ -62,4 +70,5 @@ export {
   UpdatePersonInChargeResponseSchema,
   GetMyPersonInChargeResponseSchema,
   GetPersonInChargeByCompanyIdResponseSchema,
+  GetAllPersonInChargeResponseSchema,
 };

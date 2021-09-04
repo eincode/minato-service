@@ -17,22 +17,42 @@ export type RegisterResponse = t.Static<typeof RegisterResponseSchema>;
 
 const LoginRequestSchema = t.Record({
   email: t.String,
-  password: t.String
+  password: t.String,
 });
 
 export type LoginRequest = t.Static<typeof LoginRequestSchema>;
 
 const LoginResponseSchema = t.Record({
-  accessToken: t.String
+  accessToken: t.String,
 });
 
 export type LoginResponse = t.Static<typeof LoginResponseSchema>;
 
 const UserSchema = t.Record({
   id: t.String,
-  email: t.String
+  email: t.String,
 });
 
 export type User = t.Static<typeof UserSchema>;
 
-export { RegisterRequestSchema, RegisterResponseSchema, LoginRequestSchema, LoginResponseSchema, UserSchema };
+const GetMyUserResponseSchema = UserSchema;
+
+export type GetMyUserResponse = t.Static<typeof GetMyUserResponseSchema>;
+
+const GetAllUserResponseSchema = t.Array(UserSchema);
+
+export type GetAllUserResponse = t.Static<typeof GetAllUserResponseSchema>;
+
+const DeleteUserResponseSchema = UserSchema.Or(t.Null);
+
+export type DeleteUserResponse = t.Static<typeof DeleteUserResponseSchema>;
+
+export {
+  RegisterRequestSchema,
+  RegisterResponseSchema,
+  LoginRequestSchema,
+  LoginResponseSchema,
+  UserSchema,
+  GetAllUserResponseSchema,
+  DeleteUserResponseSchema,
+};

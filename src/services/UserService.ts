@@ -38,6 +38,10 @@ async function deleteUserById(userId: string, dbClient: PrismaClient) {
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+    },
   });
   if (user) {
     return user;
@@ -45,9 +49,4 @@ async function deleteUserById(userId: string, dbClient: PrismaClient) {
   return null;
 }
 
-export {
-  getUserById,
-  getAllUsers,
-  deleteAllUsers,
-  deleteUserById,
-};
+export { getUserById, getAllUsers, deleteAllUsers, deleteUserById };

@@ -1,12 +1,19 @@
 import { PrismaClient } from ".prisma/client";
 import { Router } from "express";
 
-import { CreateProductRequest, ProductRequest } from "@/types/Product";
+import {
+  CreateProductRequestSchema,
+  CreateProductResponse,
+  DeleteProductByIdResponse,
+  GetMyProductsResponse,
+  GetProductsByCompanyIdResponse,
+  UpdateProductRequestSchema,
+  UpdateProductResponse,
+} from "@/types/Product";
 import { auth } from "../middlewares/Auth";
 import {
   createProducts,
   deleteProductById,
-  getAllProducts,
   getProductsByCompanyId,
   updateProduct,
 } from "@/services/Product";
@@ -17,20 +24,14 @@ const route = Router();
 export default (app: Router, dbClient: PrismaClient) => {
   app.use("/product", route);
 
-  route.get("/all", auth, async (_, res, next) => {
-    try {
-      const result = await getAllProducts(dbClient);
-      return res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  });
-
   route.get("/me", auth, async (req, res, next) => {
     try {
       const company = await getCompanyByUserId(req.user._id, dbClient);
       const companyId = company.id || "";
-      const products = await getProductsByCompanyId(companyId, dbClient);
+      const products: GetMyProductsResponse = await getProductsByCompanyId(
+        companyId,
+        dbClient
+      );
       return res.json(products);
     } catch (err) {
       next(err);
@@ -38,10 +39,14 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.post("/update", auth, async (req, res, next) => {
-    const request = req.body as ProductRequest;
+    const request = UpdateProductRequestSchema.check(req.body);
     const productId = req.query.productId as string;
     try {
-      const result = await updateProduct(productId, request, dbClient);
+      const result: UpdateProductResponse = await updateProduct(
+        productId,
+        request,
+        dbClient
+      );
       return res.json(result);
     } catch (err) {
       next(err);
@@ -49,10 +54,14 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.post("/:companyId", auth, async (req, res, next) => {
-    const request = req.body as CreateProductRequest;
+    const request = CreateProductRequestSchema.check(req.body);
     const companyId = req.params.companyId;
     try {
-      const result = await createProducts(request, dbClient, companyId);
+      const result: CreateProductResponse = await createProducts(
+        request,
+        dbClient,
+        companyId
+      );
       return res.json(result);
     } catch (err) {
       next(err);
@@ -61,7 +70,7 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/:companyId", auth, async (req, res, next) => {
     try {
-      const products = await getProductsByCompanyId(
+      const products: GetProductsByCompanyIdResponse = await getProductsByCompanyId(
         req.params.companyId,
         dbClient
       );
@@ -73,7 +82,7 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/delete/:productId", auth, async (req, res, next) => {
     try {
-      const product = await deleteProductById(req.params.productId, dbClient);
+      const product: DeleteProductByIdResponse = await deleteProductById(req.params.productId, dbClient);
       return res.json(product);
     } catch (err) {
       next(err);

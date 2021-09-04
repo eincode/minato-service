@@ -1,7 +1,7 @@
 import { PrismaClient } from ".prisma/client";
 import { v4 as uuid } from "uuid";
 
-import { CreateCompanyRequest } from "@/types/Company";
+import { CreateCompanyRequest, UpdateCompanyRequest } from "@/types/Company";
 import { createError, saveImage } from "@/utils/Utils";
 import { deleteProductByCompanyId } from "./Product";
 import { deletePersonInChargeByCompanyId } from "./PersonInChargeService";
@@ -25,7 +25,17 @@ async function createCompany(
           id: userId,
         },
       },
+      typeOfIndustry: {
+        connect: {
+          id: company.typeOfIndustry,
+        },
+      },
       img,
+      buyingCategories: {
+        connect:
+          company.buyingCategories?.map((category) => ({ id: category })) ??
+          undefined,
+      },
       requestAsBuyer: company.requestAsBuyer
         ? {
             create: {
@@ -44,6 +54,27 @@ async function createCompany(
         : undefined,
     },
     include: {
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsBuyer: {
         select: {
           destinationPort: true,
@@ -57,7 +88,6 @@ async function createCompany(
           request: true,
         },
       },
-      product: true,
     },
   });
   return result;
@@ -65,7 +95,7 @@ async function createCompany(
 
 async function updateCompany(
   companyId: string,
-  company: CreateCompanyRequest,
+  company: UpdateCompanyRequest,
   dbClient: PrismaClient
 ) {
   const img = company.img
@@ -87,6 +117,17 @@ async function updateCompany(
     },
     data: {
       ...company,
+      typeOfIndustry: {
+        connect: {
+          id: company.typeOfIndustry,
+        },
+      },
+      buyingCategories: {
+        connect:
+          company.buyingCategories?.map((category) => ({
+            id: category,
+          })) ?? [],
+      },
       requestAsBuyer: company.requestAsBuyer
         ? {
             upsert: {
@@ -118,7 +159,27 @@ async function updateCompany(
       img,
     },
     include: {
-      product: true,
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsSeller: {
         select: {
           request: true,
@@ -143,7 +204,27 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
       userId,
     },
     include: {
-      product: true,
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsBuyer: {
         select: {
           destinationPort: true,
@@ -165,18 +246,33 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
   throw createError("BadRequest", "Company doesn't exist");
 }
 
-async function getCompanyById(
-  companyId: string,
-  dbClient: PrismaClient,
-  includeUser = false
-) {
+async function getCompanyById(companyId: string, dbClient: PrismaClient) {
   const company = await dbClient.company.findUnique({
     where: {
       id: companyId,
     },
     include: {
-      product: true,
-      user: includeUser,
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsSeller: {
         select: {
           request: true,
@@ -230,7 +326,27 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
     include: {
       savedCompanies: {
         include: {
-          product: true,
+          typeOfIndustry: {
+            select: {
+              id: true,
+              en: true,
+              jp: true,
+            },
+          },
+          productCategories: {
+            select: {
+              id: true,
+              en: true,
+              jp: true,
+            },
+          },
+          buyingCategories: {
+            select: {
+              id: true,
+              en: true,
+              jp: true,
+            },
+          },
           requestAsBuyer: {
             select: {
               destinationPort: true,
@@ -255,7 +371,44 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
 }
 
 async function getAllCompanies(dbClient: PrismaClient) {
-  const companies = await dbClient.company.findMany();
+  const companies = await dbClient.company.findMany({
+    include: {
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      requestAsBuyer: {
+        select: {
+          destinationPort: true,
+          other: true,
+          paymentMethod: true,
+          productName: true,
+        },
+      },
+      requestAsSeller: {
+        select: {
+          request: true,
+        },
+      },
+    },
+  });
   return companies;
 }
 
@@ -266,7 +419,11 @@ async function getBuyerCompaniesByCategories(
   const companies = await dbClient.company.findMany({
     where: {
       buyingCategories: {
-        hasSome: categories,
+        some: {
+          id: {
+            in: categories,
+          },
+        },
       },
     },
     include: {
@@ -296,7 +453,11 @@ async function getSellerCompaniesByCategories(
   const companies = await dbClient.company.findMany({
     where: {
       productCategories: {
-        hasSome: categories,
+        some: {
+          id: {
+            in: categories,
+          },
+        },
       },
     },
     include: {
@@ -323,10 +484,31 @@ async function getSellerCompanies(dbClient: PrismaClient) {
   const companies = await dbClient.company.findMany({
     where: {
       productCategories: {
-        isEmpty: false,
+        every: {},
       },
     },
     include: {
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsBuyer: {
         select: {
           destinationPort: true,
@@ -340,7 +522,6 @@ async function getSellerCompanies(dbClient: PrismaClient) {
           request: true,
         },
       },
-      product: true,
     },
   });
   return companies;
@@ -350,10 +531,31 @@ async function getBuyerCompanies(dbClient: PrismaClient) {
   const companies = await dbClient.company.findMany({
     where: {
       buyingCategories: {
-        isEmpty: false,
+        every: {},
       },
     },
     include: {
+      typeOfIndustry: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      productCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
+      buyingCategories: {
+        select: {
+          id: true,
+          en: true,
+          jp: true,
+        },
+      },
       requestAsBuyer: {
         select: {
           destinationPort: true,
@@ -367,7 +569,6 @@ async function getBuyerCompanies(dbClient: PrismaClient) {
           request: true,
         },
       },
-      product: true,
     },
   });
   return companies;
