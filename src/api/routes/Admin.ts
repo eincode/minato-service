@@ -8,7 +8,11 @@ import {
 } from "@/services/IndustryService";
 import { getAllPersonsInCharge } from "@/services/PersonInChargeService";
 import { getAllProducts } from "@/services/Product";
-import { deleteUserById, getAllUsers, getUserById } from "@/services/UserService";
+import {
+  deleteUserById,
+  getAllUsers,
+  getUserById,
+} from "@/services/UserService";
 import {
   AddCategoryRequestSchema,
   AddCategoryResponse,
@@ -20,11 +24,20 @@ import {
 import { GetAllCompaniesResponse } from "@/types/Company";
 import { GetAllPersonInChargeResponse } from "@/types/PersonInCharge";
 import { GetAllProductsResponse } from "@/types/Product";
-import { DeleteUserResponse, GetAllUserResponse, LoginRequestSchema, LoginResponse } from "@/types/User";
+import {
+  DeleteUserResponse,
+  GetAllUserResponse,
+  LoginRequestSchema,
+  LoginResponse,
+} from "@/types/User";
 import { createError } from "@/utils/Utils";
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { auth } from "../middlewares/Auth";
+import { deleteAllCompanies } from "@/services/CompanyService";
+import { deleteAllPics } from "@/services/PersonInChargeService";
+import { deleteAllProducts } from "@/services/Product";
+import { deleteAllUsers } from "@/services/UserService";
 
 const route = Router();
 
@@ -59,6 +72,18 @@ export default (app: Router, dbClient: PrismaClient) => {
         dbClient
       );
       res.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/delete-all-data", async (_, res, next) => {
+    try {
+      await deleteAllProducts(dbClient);
+      await deleteAllPics(dbClient);
+      await deleteAllCompanies(dbClient);
+      await deleteAllUsers(dbClient);
+      res.json({ success: true });
     } catch (err) {
       next(err);
     }
@@ -136,7 +161,10 @@ export default (app: Router, dbClient: PrismaClient) => {
     try {
       const userToDelete = await getUserById(req.params.userId, dbClient);
       if (userToDelete) {
-        const user: DeleteUserResponse = await deleteUserById(userToDelete.id, dbClient);
+        const user: DeleteUserResponse = await deleteUserById(
+          userToDelete.id,
+          dbClient
+        );
         return res.json(user);
       }
       throw createError("BadRequest", "User not found");

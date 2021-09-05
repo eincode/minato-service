@@ -9,10 +9,6 @@ import {
 } from "@/types/User";
 import { login, signUp } from "@/services/AuthService";
 import { auth } from "../middlewares/Auth";
-import { deleteAllCompanies } from "@/services/CompanyService";
-import { deleteAllPics } from "@/services/PersonInChargeService";
-import { deleteAllProducts } from "@/services/Product";
-import { deleteAllUsers } from "@/services/UserService";
 
 const route = Router();
 
@@ -41,17 +37,5 @@ export default (app: Router, dbClient: PrismaClient) => {
 
   route.get("/me", auth, async (req, res) => {
     res.json(req.user);
-  });
-
-  route.get("/delete-all-data", async (_, res, next) => {
-    try {
-      await deleteAllProducts(dbClient);
-      await deleteAllPics(dbClient);
-      await deleteAllCompanies(dbClient);
-      await deleteAllUsers(dbClient);
-      res.json({ success: true });
-    } catch (err) {
-      next(err);
-    }
   });
 };
