@@ -47,6 +47,12 @@ const DeleteUserResponseSchema = UserSchema.Or(t.Null);
 
 export type DeleteUserResponse = t.Static<typeof DeleteUserResponseSchema>;
 
+const GetUserByIdResponseSchema = UserSchema.Or(t.Null);
+
+export type GetUserByIdResponse = t.Static<
+  typeof GetUserByIdResponseSchema
+>;
+
 export {
   RegisterRequestSchema,
   RegisterResponseSchema,
@@ -55,4 +61,5 @@ export {
   UserSchema,
   GetAllUserResponseSchema,
   DeleteUserResponseSchema,
+  GetUserByIdResponseSchema,
 };

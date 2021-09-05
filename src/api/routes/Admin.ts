@@ -27,6 +27,7 @@ import { GetAllProductsResponse } from "@/types/Product";
 import {
   DeleteUserResponse,
   GetAllUserResponse,
+  GetUserByIdResponse,
   LoginRequestSchema,
   LoginResponse,
 } from "@/types/User";
@@ -151,6 +152,18 @@ export default (app: Router, dbClient: PrismaClient) => {
   route.get("/users/all", auth, async (_, res, next) => {
     try {
       const result: GetAllUserResponse = await getAllUsers(dbClient);
+      return res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  route.get("/users/:userId", auth, async (req, res, next) => {
+    try {
+      const result: GetUserByIdResponse = await getUserById(
+        req.params.userId,
+        dbClient
+      );
       return res.json(result);
     } catch (err) {
       next(err);
