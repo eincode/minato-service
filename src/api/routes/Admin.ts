@@ -137,7 +137,7 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  route.get("/pic//all", auth, async (_, res, next) => {
+  route.get("/pic/all", auth, async (_, res, next) => {
     try {
       const pics: GetAllPersonInChargeResponse = await getAllPersonsInCharge(
         dbClient
@@ -148,7 +148,7 @@ export default (app: Router, dbClient: PrismaClient) => {
     }
   });
 
-  route.get("/users//all", auth, async (_, res, next) => {
+  route.get("/users/all", auth, async (_, res, next) => {
     try {
       const result: GetAllUserResponse = await getAllUsers(dbClient);
       return res.json(result);
