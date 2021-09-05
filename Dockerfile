@@ -3,7 +3,6 @@ WORKDIR /app
 COPY package.json /app
 RUN npm install
 COPY . /app
-ADD public /app/public
 RUN npm run migrate
 RUN npm run generatePrisma
 RUN npm run build
