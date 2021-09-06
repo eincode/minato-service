@@ -24,6 +24,7 @@ export type LoginRequest = t.Static<typeof LoginRequestSchema>;
 
 const LoginResponseSchema = t.Record({
   accessToken: t.String,
+  isProfileComplete: t.Boolean,
 });
 
 export type LoginResponse = t.Static<typeof LoginResponseSchema>;
@@ -49,9 +50,7 @@ export type DeleteUserResponse = t.Static<typeof DeleteUserResponseSchema>;
 
 const GetUserByIdResponseSchema = UserSchema.Or(t.Null);
 
-export type GetUserByIdResponse = t.Static<
-  typeof GetUserByIdResponseSchema
->;
+export type GetUserByIdResponse = t.Static<typeof GetUserByIdResponseSchema>;
 
 export {
   RegisterRequestSchema,

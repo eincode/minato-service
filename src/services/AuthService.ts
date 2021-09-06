@@ -6,6 +6,7 @@ import { v4 as uuid } from "uuid";
 
 import config from "@/config";
 import { createError } from "@/utils/Utils";
+import { getCompanyByUserId } from "./CompanyService";
 
 async function hashPassword(password: string) {
   const salt = await bcrypt.genSalt(parseInt(config.saltFactor));
@@ -90,7 +91,12 @@ async function login(req: LoginRequest, dbClient: PrismaClient) {
   const isPasswordMatched = await comparePassword(req.password, user.password);
   if (isPasswordMatched) {
     const token = generateToken(user);
-    return { accessToken: token };
+    try {
+      await getCompanyByUserId(user.id, dbClient);
+    } catch (err) {
+      return { accessToken: token, isProfileComplete: false };
+    }
+    return { accessToken: token, isProfileComplete: true };
   } else {
     throw createError("BadRequest", "Wrong username and password combination!");
   }
@@ -99,7 +105,7 @@ async function login(req: LoginRequest, dbClient: PrismaClient) {
 async function adminLogin(req: LoginRequest) {
   if (req.email === "admin@admin.com" && req.password === "akuPadamu") {
     const token = generateAdminToken();
-    return { accessToken: token };
+    return { accessToken: token, isProfileComplete: false };
   } else {
     throw createError("BadRequest", "Wrong credentials");
   }
