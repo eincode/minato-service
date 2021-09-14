@@ -1,5 +1,6 @@
 import * as t from "runtypes";
 import { CategorySchema } from "./Category";
+import { ProductSchema } from "./Product";
 
 const BuyerRequestSchema = t.Record({
   productName: t.String,
@@ -27,6 +28,7 @@ const CompanySchema = t.Record({
   email: t.String,
   phoneNumber: t.String,
   img: t.String.Or(t.Null),
+  product: t.Array(ProductSchema),
   productCategories: t.Array(CategorySchema),
   buyingCategories: t.Array(CategorySchema),
   requestAsBuyer: BuyerRequestSchema.Or(t.Null),

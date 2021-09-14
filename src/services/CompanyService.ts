@@ -88,6 +88,18 @@ async function createCompany(
           request: true,
         },
       },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
+        },
+      },
     },
   });
   return result;
@@ -193,6 +205,18 @@ async function updateCompany(
           productName: true,
         },
       },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
+        },
+      },
     },
   });
   return editedCompany;
@@ -236,6 +260,18 @@ async function getCompanyByUserId(userId: string, dbClient: PrismaClient) {
       requestAsSeller: {
         select: {
           request: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
         },
       },
     },
@@ -284,6 +320,18 @@ async function getCompanyById(companyId: string, dbClient: PrismaClient) {
           other: true,
           paymentMethod: true,
           productName: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
         },
       },
     },
@@ -360,6 +408,18 @@ async function getSavedCompany(userId: string, dbClient: PrismaClient) {
               request: true,
             },
           },
+          product: {
+            select: {
+              id: true,
+              companyId: true,
+              category: true,
+              name: true,
+              description: true,
+              img: true,
+              isHalal: true,
+              minimumOrderQuantity: true,
+            },
+          },
         },
       },
     },
@@ -405,6 +465,18 @@ async function getAllCompanies(dbClient: PrismaClient) {
       requestAsSeller: {
         select: {
           request: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
         },
       },
     },
@@ -522,6 +594,18 @@ async function getSellerCompanies(dbClient: PrismaClient) {
           request: true,
         },
       },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
+        },
+      },
     },
   });
   return companies;
@@ -567,6 +651,18 @@ async function getBuyerCompanies(dbClient: PrismaClient) {
       requestAsSeller: {
         select: {
           request: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          companyId: true,
+          category: true,
+          name: true,
+          description: true,
+          img: true,
+          isHalal: true,
+          minimumOrderQuantity: true,
         },
       },
     },
