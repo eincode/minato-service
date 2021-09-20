@@ -119,6 +119,16 @@ async function updateCompany(
     },
     data: {
       ...company,
+      requestAsBuyer: {
+        update: {
+          ...company.requestAsBuyer,
+        },
+      },
+      requestAsSeller: {
+        update: {
+          ...company.requestAsSeller,
+        },
+      },
       img,
     },
     include: {
