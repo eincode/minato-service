@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import express, { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
+import morganBody from "morgan-body";
 import cors from "cors";
 
 import config from "@/config";
@@ -26,6 +27,7 @@ async function loadExpress(app: Express, dbClient: PrismaClient) {
   app.use(express.json({ limit: "20mb" }));
 
   app.use(morgan("dev"));
+  morganBody(app);
 
   app.use(cors());
 

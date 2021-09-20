@@ -36,8 +36,8 @@ export default (app: Router, dbClient: PrismaClient) => {
   app.use("/company", route);
 
   route.post("/", auth, async (req, res, next) => {
-    const request = CreateCompanyRequestSchema.check(req.body);
     try {
+      const request = CreateCompanyRequestSchema.check(req.body);
       const result: CreateCompanyResponse = await createCompany(
         request,
         dbClient,
@@ -50,9 +50,9 @@ export default (app: Router, dbClient: PrismaClient) => {
   });
 
   route.post("/update", auth, async (req, res, next) => {
-    const request = UpdateCompanyRequestSchema.check(req.body);
-    const companyId = req.query.companyId as string;
     try {
+      const companyId = req.query.companyId as string;
+      const request = UpdateCompanyRequestSchema.check(req.body);
       const result: UpdateCompanyResponse = await updateCompany(
         companyId,
         request,
