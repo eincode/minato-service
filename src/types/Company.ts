@@ -62,15 +62,11 @@ export type CreateCompanyResponse = t.Static<
 const UpdateCompanyRequestSchema = t.Record({
   country: t.String.optional(),
   name: t.String.optional(),
-  typeOfIndustry: t.String.optional(),
   address: t.String.optional(),
   website: t.String.optional(),
   email: t.String.optional(),
   phoneNumber: t.String.optional(),
   img: t.String.optional(),
-  buyingCategories: t.Array(t.String).optional(),
-  requestAsBuyer: BuyerRequestSchema.optional(),
-  requestAsSeller: SellerRequestSchema.optional(),
 });
 
 export type UpdateCompanyRequest = t.Static<typeof UpdateCompanyRequestSchema>;
