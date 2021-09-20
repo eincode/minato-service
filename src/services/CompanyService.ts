@@ -549,11 +549,7 @@ async function getSellerCompaniesByCategories(
 
 async function getSellerCompanies(dbClient: PrismaClient) {
   const companies = await dbClient.company.findMany({
-    where: {
-      productCategories: {
-        every: {},
-      },
-    },
+    where: {},
     include: {
       typeOfIndustry: {
         select: {
@@ -603,16 +599,12 @@ async function getSellerCompanies(dbClient: PrismaClient) {
       },
     },
   });
-  return companies;
+  return companies.filter((company) => company.productCategories.length > 0);
 }
 
 async function getBuyerCompanies(dbClient: PrismaClient) {
   const companies = await dbClient.company.findMany({
-    where: {
-      buyingCategories: {
-        every: {},
-      },
-    },
+    where: {},
     include: {
       typeOfIndustry: {
         select: {
@@ -662,7 +654,7 @@ async function getBuyerCompanies(dbClient: PrismaClient) {
       },
     },
   });
-  return companies;
+  return companies.filter((company) => company.buyingCategories.length > 0);
 }
 
 async function deleteAllCompanies(dbClient: PrismaClient) {
