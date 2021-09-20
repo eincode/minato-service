@@ -113,22 +113,50 @@ async function updateCompany(
   const img = company.img
     ? saveImage(company.img, "Company", companyId)
     : undefined;
+  const requestAsBuyer = await dbClient.buyerRequest.findFirst({
+    where: {
+      companyId,
+    },
+  });
+  const requestAsSeller = await dbClient.buyerRequest.findFirst({
+    where: {
+      companyId,
+    },
+  });
   const editedCompany = await dbClient.company.update({
     where: {
       id: companyId,
     },
     data: {
       ...company,
-      requestAsBuyer: {
-        update: {
-          ...company.requestAsBuyer,
-        },
-      },
-      requestAsSeller: {
-        update: {
-          ...company.requestAsSeller,
-        },
-      },
+      requestAsBuyer: company.requestAsBuyer
+        ? {
+            upsert: {
+              create: {
+                id: uuid(),
+                ...company.requestAsBuyer,
+              },
+              update: {
+                id: requestAsBuyer?.id,
+                ...company.requestAsBuyer,
+              },
+            },
+          }
+        : undefined,
+      requestAsSeller: company.requestAsSeller
+        ? {
+            upsert: {
+              create: {
+                id: uuid(),
+                ...company.requestAsSeller,
+              },
+              update: {
+                id: requestAsSeller?.id,
+                ...company.requestAsSeller,
+              },
+            },
+          }
+        : undefined,
       img,
     },
     include: {
