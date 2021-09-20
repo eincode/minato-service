@@ -67,6 +67,7 @@ const UpdateCompanyRequestSchema = t.Record({
   email: t.String.optional(),
   phoneNumber: t.String.optional(),
   img: t.String.optional(),
+  buyingCategories: t.Array(t.String).optional(),
   requestAsBuyer: BuyerRequestSchema.optional(),
   requestAsSeller: SellerRequestSchema.optional(),
 });
