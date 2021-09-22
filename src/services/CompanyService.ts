@@ -129,12 +129,13 @@ async function updateCompany(
     },
     data: {
       ...company,
-      buyingCategories: {
-        connect:
-          company.buyingCategories?.map((category) => ({
-            id: category,
-          })) ?? [],
-      },
+      buyingCategories: company.buyingCategories
+        ? {
+            set: company.buyingCategories.map((category) => ({
+              id: category,
+            })),
+          }
+        : undefined,
       requestAsBuyer: company.requestAsBuyer
         ? {
             upsert: {
